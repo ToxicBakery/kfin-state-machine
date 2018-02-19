@@ -10,7 +10,7 @@ before_script:
 - echo "Travis tag $TRAVIS_TAG"
 
 stages:
-  - compile
+  - name: compile
   - name: deploy
     if: tag IS present OR branch = master
 
