@@ -12,7 +12,7 @@ buildscript {
 }
 
 allprojects {
-    group 'com.toxicbakery.kfinstatemachine'
+    group 'com.ToxicBakery.kfinstatemachine'
     version "1.0.${buildNumber()}" + (isTag() ? "" : "-SNAPSHOT")
 
     repositories {
