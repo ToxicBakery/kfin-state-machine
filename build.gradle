@@ -13,9 +13,13 @@ buildscript {
 
 allprojects {
     group 'com.toxicbakery.kfinstatemachine'
-    version '1.0-SNAPSHOT'
+    version "1.0.${buildNumber()}" + (isTag() ? "" : "-SNAPSHOT")
 
     repositories {
         mavenCentral()
     }
 }
+
+static boolean isTag() { return System.getenv('TRAVIS_TAG')?.isEmpty() ?: false }
+
+static String buildNumber() { return System.getenv('TRAVIS_BUILD_NUMBER') ?: "0" }
