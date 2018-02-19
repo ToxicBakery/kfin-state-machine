@@ -3,6 +3,9 @@ language: java
 jdk:
 - oraclejdk8
 
+install:
+- true
+
 before_script:
 - chmod +x gradlew
 - echo "Travis branch is $TRAVIS_BRANCH"

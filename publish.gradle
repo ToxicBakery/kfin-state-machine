@@ -23,7 +23,6 @@ publishing {
 }
 
 signing {
-    required { isTag() }
     sign configurations.archives
 }
 
