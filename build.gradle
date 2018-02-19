@@ -20,6 +20,6 @@ allprojects {
     }
 }
 
-static boolean isTag() { return System.getenv('TRAVIS_TAG')?.isEmpty() ?: false }
+static boolean isTag() { return !System.getenv('TRAVIS_TAG')?.isEmpty() ?: false }
 
 static String buildNumber() { return System.getenv('TRAVIS_BUILD_NUMBER') ?: "0" }
