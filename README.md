@@ -4,7 +4,7 @@ Kotlin library for creating finite state machines.
 > It is an abstract machine that can be in exactly one of a finite number of states at any given time. The FSM can change from one state to another in response to some external inputs; the change from one state to another is called a transition. An FSM is defined by a list of its states, its initial state, and the conditions for each transition.  
 > &mdash; [Wikipedia - Finite-state machine][1]
 
- ## Sample Usage
+## Sample Usage
 ```kotlin
 sealed class Energy(
         override val transitions: Set<KClass<out FiniteState>>
@@ -21,6 +21,18 @@ class Usage {
     }
 
 }
+```
+
+## Install
+
+Core
+```groovy
+compile "com.ToxicBakery.kfinstatemachine:core:1.0.20"
+```
+
+Rx based machine, includes core dependency
+```groovy
+compile "com.ToxicBakery.kfinstatemachine:rx:1.0.20"
 ```
 
 [1]:https://en.wikipedia.org/wiki/Finite-state_machine
