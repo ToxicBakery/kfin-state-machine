@@ -78,4 +78,9 @@ afterEvaluate { project ->
             }
         }
     }
+
+    artifacts {
+        archives javadocJar
+        archives javaSources
+    }
 }
