@@ -1,10 +1,11 @@
 package com.toxicbakery.kfinstatemachine
 
-import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
+import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
+import com.toxicbakery.kfinstatemachine.graph.exitingEdgesForNodeValue
 
 open class BaseMachine<F : FiniteState, T : Transition>(
-        private val directedGraph: DirectedGraph<F, T>,
+        private val directedGraph: IDirectedGraph<F, T>,
         initialState: F
 ) : StateMachine<F, T> {
 
@@ -29,7 +30,7 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     }
 
     protected fun findNextNode(transition: T) =
-            directedGraph.rightEdgesForValue(state)
+            directedGraph.exitingEdgesForNodeValue(state)
                     .find { it.label == transition }
                     ?: throw Exception("Illegal transition $transition for $state")
 

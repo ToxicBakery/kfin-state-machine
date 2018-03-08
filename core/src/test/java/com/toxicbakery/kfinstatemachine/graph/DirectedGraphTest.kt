@@ -15,7 +15,7 @@ class DirectedGraphTest {
                 ))
 
         DirectedGraph(edges)
-                .rightEdgesForValue("node_1")
+                .exitingEdgesForNodeValue("node_1")
                 .let { assertEquals(edges, it) }
     }
 }

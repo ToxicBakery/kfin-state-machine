@@ -10,7 +10,7 @@ import kotlin.collections.set
  * Based on: http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
  */
 internal class DijkstraAlgorithm<N, E>(
-        graph: DirectedGraph<N, E>,
+        graph: IDirectedGraph<N, E>,
         source: GraphNode<N>
 ) : ShortestPathAlgorithm<N> {
 

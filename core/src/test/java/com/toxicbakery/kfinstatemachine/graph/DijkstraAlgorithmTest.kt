@@ -25,7 +25,7 @@ class DijkstraAlgorithmTest {
         // Each graph node only has one edge sequentially from node 1 to node 5. Shortest path from nodes 1 to 5 should
         // return the entire graph.
         DirectedGraph(edges.toSet())
-                .shortestPath(nodes[0], nodes[4])
+                .let { DijkstraAlgorithm(it, nodes[0]).shortestPathTo(nodes[4]) }
                 .also { calculated ->
                     Assert.assertEquals(
                             nodes,
@@ -37,7 +37,7 @@ class DijkstraAlgorithmTest {
         edges.plus(GraphEdge(nodes[1], nodes[4], "2 -> 5"))
                 .toSet()
                 .let { DirectedGraph(it) }
-                .shortestPath(nodes[0], nodes[4])
+                .let { DijkstraAlgorithm(it, nodes[0]).shortestPathTo(nodes[4]) }
                 .also { calculated ->
                     Assert.assertEquals(
                             listOf(
@@ -53,7 +53,7 @@ class DijkstraAlgorithmTest {
     @Test(expected = Exception::class)
     fun shortestPathToUnrelatedNode() {
         DirectedGraph(setOf<GraphEdge<String, String>>())
-                .shortestPath(GraphNode("node_1"), GraphNode("node_2"))
+                .let { DijkstraAlgorithm(it, GraphNode("node_1")).shortestPathTo(GraphNode("node_2")) }
     }
 
 }
