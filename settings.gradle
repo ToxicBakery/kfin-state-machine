@@ -1,1 +1,1 @@
-include 'core', 'rx', 'test-classes'
+include 'core'

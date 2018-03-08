@@ -6,7 +6,16 @@ package com.toxicbakery.kfinstatemachine
 interface StateMachine {
 
     /**
-     * Transition the machine to a given state.
+     * Transition the machine.
      */
-    fun transition(transitionState: FiniteState)
+    fun performTransition(transition: Transition)
+
+    companion object {
+
+        /**
+         * Invalid initial state of a newly created machine.
+         */
+        val initialState: FiniteState = object : FiniteState {}
+    }
+
 }
