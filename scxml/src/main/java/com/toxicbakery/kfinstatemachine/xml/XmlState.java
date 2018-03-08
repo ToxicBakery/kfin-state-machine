@@ -7,7 +7,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class XmlState {
+public class XmlState {
     @JacksonXmlProperty(isAttribute = true)
     public String id;
 

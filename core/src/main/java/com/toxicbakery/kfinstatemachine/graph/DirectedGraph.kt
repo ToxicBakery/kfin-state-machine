@@ -1,28 +1,20 @@
 package com.toxicbakery.kfinstatemachine.graph
 
-data class GraphEdge<out V>(
-        val left: GraphNode<V>,
-        val right: GraphNode<V>,
-        val label: String
-)
-
-data class GraphNode<out V>(
-        val value: V
-)
-
-data class DirectedGraph<V>(
-        val edges: Set<GraphEdge<V>>,
-        private val shortestPathAlgorithmFactory: (DirectedGraph<V>, GraphNode<V>) -> ShortestPathAlgorithm<V> =
+data class DirectedGraph<N, out E>(
+        val edges: Set<GraphEdge<N, E>>,
+        private val shortestPathAlgorithmFactory: (DirectedGraph<N, E>, GraphNode<N>) -> ShortestPathAlgorithm<N> =
                 { graph, source -> DijkstraAlgorithm(graph, source) }
-) {
+) : IDirectedGraph<N, E> {
 
-    val nodes: Set<GraphNode<V>> = edges.flatMap { setOf(it.left, it.right) }
+    override val nodes: Set<GraphNode<N>> = edges.flatMap { setOf(it.left, it.right) }
             .toSet()
 
-    fun shortestPath(
-            source: GraphNode<V>,
-            destination: GraphNode<V>
-    ): List<GraphNode<V>> = shortestPathAlgorithmFactory(this, source).shortestPathTo(destination)
+    override fun shortestPath(
+            source: GraphNode<N>,
+            destination: GraphNode<N>
+    ): List<GraphNode<N>> = shortestPathAlgorithmFactory(this, source).shortestPathTo(destination)
+
+    override fun rightEdgesForValue(nodeValue: N): Set<GraphEdge<N, E>> =
+            edges.filter { it.left.value == nodeValue }.toSet()
 
 }
-

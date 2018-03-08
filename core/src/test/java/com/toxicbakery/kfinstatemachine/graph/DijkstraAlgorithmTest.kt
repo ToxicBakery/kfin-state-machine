@@ -52,7 +52,7 @@ class DijkstraAlgorithmTest {
 
     @Test(expected = Exception::class)
     fun shortestPathToUnrelatedNode() {
-        DirectedGraph(setOf<GraphEdge<String>>())
+        DirectedGraph(setOf<GraphEdge<String, String>>())
                 .shortestPath(GraphNode("node_1"), GraphNode("node_2"))
     }
 

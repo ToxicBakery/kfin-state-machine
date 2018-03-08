@@ -9,16 +9,16 @@ import kotlin.collections.set
  *
  * Based on: http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
  */
-internal class DijkstraAlgorithm<V>(
-        graph: DirectedGraph<V>,
-        source: GraphNode<V>
-) : ShortestPathAlgorithm<V> {
+internal class DijkstraAlgorithm<N, E>(
+        graph: DirectedGraph<N, E>,
+        source: GraphNode<N>
+) : ShortestPathAlgorithm<N> {
 
-    private val edges: List<GraphEdge<V>> = ArrayList<GraphEdge<V>>(graph.edges)
-    private val settledNodes: MutableSet<GraphNode<V>> = hashSetOf()
-    private val unSettledNodes: MutableSet<GraphNode<V>> = hashSetOf(source)
-    private val predecessors: MutableMap<GraphNode<V>, GraphNode<V>> = hashMapOf()
-    private val distance: MutableMap<GraphNode<V>, Int> = hashMapOf(source to 0)
+    private val edges: List<GraphEdge<N, E>> = ArrayList<GraphEdge<N, E>>(graph.edges)
+    private val settledNodes: MutableSet<GraphNode<N>> = hashSetOf()
+    private val unSettledNodes: MutableSet<GraphNode<N>> = hashSetOf(source)
+    private val predecessors: MutableMap<GraphNode<N>, GraphNode<N>> = hashMapOf()
+    private val distance: MutableMap<GraphNode<N>, Int> = hashMapOf(source to 0)
 
     init {
         while (unSettledNodes.size > 0) {
@@ -29,10 +29,10 @@ internal class DijkstraAlgorithm<V>(
         }
     }
 
-    override fun shortestPathTo(target: GraphNode<V>): List<GraphNode<V>> {
+    override fun shortestPathTo(target: GraphNode<N>): List<GraphNode<N>> {
         // check if a path exists
         if (!predecessors.containsKey(target)) throw Exception("No path between nodes.")
-        val path = LinkedList<GraphNode<V>>().apply { add(target) }
+        val path = LinkedList<GraphNode<N>>().apply { add(target) }
         while (true) {
             predecessors[path.first]
                     ?.apply { path.push(this) }
@@ -41,7 +41,7 @@ internal class DijkstraAlgorithm<V>(
         return path
     }
 
-    private fun calculateDistances(node: GraphNode<V>) {
+    private fun calculateDistances(node: GraphNode<N>) {
         val adjacentNodes = getNeighbors(node)
         for (target in adjacentNodes) {
             if (getShortestDistance(target) > getShortestDistance(node) + getDistance(node, target)) {
@@ -52,21 +52,21 @@ internal class DijkstraAlgorithm<V>(
         }
     }
 
-    private fun getDistance(node: GraphNode<V>, target: GraphNode<V>): Int {
+    private fun getDistance(node: GraphNode<N>, target: GraphNode<N>): Int {
         edges.forEach { edge -> if (edge.left == node && edge.right == target) return 1 }
         throw Exception("No path between nodes")
     }
 
-    private fun getNeighbors(node: GraphNode<V>): List<GraphNode<V>> {
-        val neighbors = ArrayList<GraphNode<V>>()
+    private fun getNeighbors(node: GraphNode<N>): List<GraphNode<N>> {
+        val neighbors = ArrayList<GraphNode<N>>()
         for (edge in edges) {
             if (edge.left == node && !isSettled(edge.right)) neighbors.add(edge.right)
         }
         return neighbors
     }
 
-    private fun getMinimum(vertexes: Set<GraphNode<V>>): GraphNode<V> {
-        var minimum: GraphNode<V> = vertexes.first()
+    private fun getMinimum(vertexes: Set<GraphNode<N>>): GraphNode<N> {
+        var minimum: GraphNode<N> = vertexes.first()
         for (vertex in vertexes) {
             if (getShortestDistance(vertex) < getShortestDistance(minimum)) {
                 minimum = vertex
@@ -75,10 +75,10 @@ internal class DijkstraAlgorithm<V>(
         return minimum
     }
 
-    private fun isSettled(vertex: GraphNode<V>): Boolean =
+    private fun isSettled(vertex: GraphNode<N>): Boolean =
             settledNodes.contains(vertex)
 
-    private fun getShortestDistance(destination: GraphNode<V>): Int =
+    private fun getShortestDistance(destination: GraphNode<N>): Int =
             distance[destination] ?: Integer.MAX_VALUE
 
 }
