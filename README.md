@@ -25,14 +25,19 @@ class Usage {
 
 ## Install
 
-Core
+Core, includes directed graphs and base state machine implementation
 ```groovy
-compile "com.ToxicBakery.kfinstatemachine:core:1.0.20"
+compile "com.ToxicBakery.kfinstatemachine:core:2.+"
 ```
 
-Rx based machine, includes core dependency
+SCXML, includes core dependency
 ```groovy
-compile "com.ToxicBakery.kfinstatemachine:rx:1.0.20"
+compile "com.ToxicBakery.kfinstatemachine:scxml:2.+"
+```
+
+Rx support, includes core dependency
+```groovy
+compile "com.ToxicBakery.kfinstatemachine:rx:2.+"
 ```
 
 [1]:https://en.wikipedia.org/wiki/Finite-state_machine
