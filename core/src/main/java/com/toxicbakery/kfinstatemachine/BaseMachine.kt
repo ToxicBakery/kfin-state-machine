@@ -42,7 +42,7 @@ open class BaseMachine<F : FiniteState, T : Transition>(
                     ?: throw Exception("Illegal transition $transition for $state")
 
     protected fun notifyListeners(transition: T, nextState: F) =
-            listeners.forEach { it: TransitionListener<F, T> -> it.onTransition(transition, nextState) }
+            listeners.forEach { transitionListener -> transitionListener.onTransition(transition, nextState) }
 
     private fun getMatchingNodeByTransitionName(event: String) =
             directedGraph.edges

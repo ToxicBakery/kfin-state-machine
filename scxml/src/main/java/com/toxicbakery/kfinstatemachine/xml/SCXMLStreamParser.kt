@@ -5,7 +5,7 @@ import com.toxicbakery.kfinstatemachine.xml.model.XmlRoot
 import java.io.InputStream
 import javax.xml.stream.XMLInputFactory
 
-class BasicSCXMLStreamParser : StreamParser<XmlRoot> {
+class SCXMLStreamParser : StreamParser<XmlRoot> {
 
     override fun parseStream(inputStream: InputStream): XmlRoot =
             XMLInputFactory.newFactory()

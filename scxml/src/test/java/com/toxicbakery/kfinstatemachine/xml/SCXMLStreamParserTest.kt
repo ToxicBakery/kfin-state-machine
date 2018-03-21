@@ -4,13 +4,13 @@ import com.toxicbakery.kfinstatemachine.FiniteState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class BasicSCXMLStreamParserTest {
+class SCXMLStreamParserTest {
 
     @Test
     fun parseStopWatch() {
-        val machine = BasicSCXMLStreamParser::class.java.getResource("stopwatch.xml")
+        val machine = SCXMLStreamParser::class.java.getResource("stopwatch.xml")
                 .openStream()
-                .let(BasicSCXMLStreamParser()::parseStream)
+                .let(SCXMLStreamParser()::parseStream)
                 .createSimpleMachine()
 
         assertEquals(FiniteXmlState("ready"), machine.state)
@@ -33,9 +33,9 @@ class BasicSCXMLStreamParserTest {
 
     @Test
     fun parseStopWatchWithMapping() {
-        val machine = BasicSCXMLStreamParser::class.java.getResource("stopwatch.xml")
+        val machine = SCXMLStreamParser::class.java.getResource("stopwatch.xml")
                 .openStream()
-                .let(BasicSCXMLStreamParser()::parseStream)
+                .let(SCXMLStreamParser()::parseStream)
                 .createSimpleMachineWithMapping(
                         stateMapper = { id ->
                             when (id) {
@@ -62,9 +62,9 @@ class BasicSCXMLStreamParserTest {
 
     @Test
     fun parseMicrowave() {
-        BasicSCXMLStreamParser::class.java.getResource("microwave.xml")
+        SCXMLStreamParser::class.java.getResource("microwave.xml")
                 .openStream()
-                .let(BasicSCXMLStreamParser()::parseStream)
+                .let(SCXMLStreamParser()::parseStream)
     }
 
 }
