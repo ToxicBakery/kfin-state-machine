@@ -7,7 +7,7 @@ package com.toxicbakery.kfinstatemachine
 interface Transition {
 
     /**
-     * Name of the transition. The name usually describes the action of transitioning between two states.
+     * Name of the transition. The event usually describes the action of transitioning between two states.
      */
-    val name: String
+    val event: String
 }

@@ -23,6 +23,11 @@ interface StateMachine<out F : FiniteState, T : Transition> {
     /**
      * Transition the machine.
      */
+    fun performTransitionByName(event: String)
+
+    /**
+     * Transition the machine.
+     */
     fun performTransition(transition: T)
 
 }

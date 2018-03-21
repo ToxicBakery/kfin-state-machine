@@ -1,4 +1,4 @@
-package com.toxicbakery.kfinstatemachine.xml;
+package com.toxicbakery.kfinstatemachine.xml.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;

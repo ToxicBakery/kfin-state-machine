@@ -1,6 +1,7 @@
 package com.toxicbakery.kfinstatemachine.xml
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import com.toxicbakery.kfinstatemachine.xml.model.XmlRoot
 import java.io.InputStream
 import javax.xml.stream.XMLInputFactory
 

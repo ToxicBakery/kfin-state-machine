@@ -32,7 +32,7 @@ class BaseMachineTest {
         object Potential : Energy()
     }
 
-    sealed class EnergyTransition(override val name: String) : Transition {
+    sealed class EnergyTransition(override val event: String) : Transition {
         object Store : EnergyTransition("Store")
         object Release : EnergyTransition("Release")
         object Invalid : EnergyTransition("Invalid")
@@ -47,6 +47,32 @@ class BaseMachineTest {
 
         machine.performTransition(Release)
         assertEquals(Kinetic, machine.state)
+    }
+
+    @Test
+    fun performTransitionByName() {
+        val machine = BaseMachine(
+                directedGraph = directedGraph,
+                initialState = Potential
+        )
+
+        machine.performTransitionByName("Release")
+        assertEquals(Kinetic, machine.state)
+    }
+
+    @Test
+    fun performTransitionByNameWithInvalidName() {
+        val machine = BaseMachine(
+                directedGraph = directedGraph,
+                initialState = Potential
+        )
+
+        try {
+            machine.performTransitionByName("Invalid")
+            fail("Expected exception caused by invalid name.")
+        } catch (e: Exception) {
+            assertTrue(e.message!!.startsWith("Undefined event Invalid for state "))
+        }
     }
 
     @Test(expected = Exception::class)

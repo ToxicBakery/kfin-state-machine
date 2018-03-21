@@ -1,6 +1,7 @@
 package com.toxicbakery.kfinstatemachine
 
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
+import com.toxicbakery.kfinstatemachine.graph.GraphNode
 import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.exitingEdgesForNodeValue
 
@@ -9,11 +10,11 @@ open class BaseMachine<F : FiniteState, T : Transition>(
         initialState: F
 ) : StateMachine<F, T> {
 
-    private var _state: F = initialState
+    private var node: GraphNode<F> = directedGraph.nodes.first { it.value == initialState }
     private val listeners: MutableSet<TransitionListener<F, T>> = hashSetOf()
 
     override val state: F
-        get() = _state
+        get() = node.value
 
     override fun addListener(listener: TransitionListener<F, T>) {
         listeners.add(listener)
@@ -23,10 +24,16 @@ open class BaseMachine<F : FiniteState, T : Transition>(
         listeners.remove(listener)
     }
 
+    override fun performTransitionByName(event: String) {
+        getMatchingNodeByTransitionName(event)
+                .label
+                .let(this::performTransition)
+    }
+
     override fun performTransition(transition: T) {
-        _state = findNextNode(transition)
-                .let { it: GraphEdge<F, T> -> it.right.value }
-                .also { nextState: F -> notifyListeners(transition, nextState) }
+        node = findNextNode(transition)
+                .let { it: GraphEdge<F, T> -> it.right }
+                .also { nextNode: GraphNode<F> -> notifyListeners(transition, nextNode.value) }
     }
 
     protected fun findNextNode(transition: T) =
@@ -36,5 +43,11 @@ open class BaseMachine<F : FiniteState, T : Transition>(
 
     protected fun notifyListeners(transition: T, nextState: F) =
             listeners.forEach { it: TransitionListener<F, T> -> it.onTransition(transition, nextState) }
+
+    private fun getMatchingNodeByTransitionName(event: String) =
+            directedGraph.edges
+                    .singleOrNull { it.left == node && it.label.event == event }
+                    ?: throw Exception("""Undefined event $event for state ${node.value}.
+                        Valid events: ${directedGraph.nodeTransitions(node).joinToString { it.event }}""")
 
 }

@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-<!-- https://github.com/apache/commons-scxml/blob/master/src/test/java/org/apache/commons/scxml2/env/groovy/microwave-04.xml -->
+<!--
+Based on:
+https://github.com/apache/commons-scxml/blob/master/src/test/java/org/apache/commons/scxml2/env/groovy/microwave-04.xml
+-->
 <!--
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -36,16 +39,14 @@
                     <transition target="idle"/>
                 </initial>
 
-                <transition target="off"/>
-
-                <transition target="off"/>
+                <transition event="turn_off" target="off"/>
 
                 <state id="idle">
-                    <transition target="cooking"/>
+                    <transition event="time" target="cooking"/>
                 </state>
 
                 <state id="cooking">
-                    <transition target="idle"/>
+                    <transition event="turn_off" target="idle"/>
 
                     <transition event="time" target="cooking"/>
                 </state>
