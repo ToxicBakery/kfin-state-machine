@@ -5,7 +5,7 @@ import javax.xml.stream.XMLStreamReader
 /**
  * Use implementation for XMLStreamReader wrapping close functionality.
  */
-internal inline fun <T : XMLStreamReader?, R> T.use(block: (T) -> R): R {
+internal fun <T : XMLStreamReader?, R> T.use(block: (T) -> R): R {
     try {
         return block(this)
     } finally {

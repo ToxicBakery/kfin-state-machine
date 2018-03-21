@@ -1,23 +1,17 @@
 package com.toxicbakery.kfinstatemachine.xml
 
-import com.toxicbakery.kfinstatemachine.FiniteState
-import com.toxicbakery.kfinstatemachine.StateMachine
-import com.toxicbakery.kfinstatemachine.Transition
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class BasicSCXMLStreamParserTest {
 
-    private val stopWatchMachine: StateMachine<FiniteState, Transition>
-        get() = BasicSCXMLStreamParser::class.java.getResource("stopwatch.xml")
-                .openStream()
-                .let(BasicSCXMLStreamParser()::parseStream)
-                .createRootMachine()
-                .let { it["root"]!! }
-
     @Test
     fun parseStopWatch() {
-        val machine = stopWatchMachine
+        val machine = BasicSCXMLStreamParser::class.java.getResource("stopwatch.xml")
+                .openStream()
+                .let(BasicSCXMLStreamParser()::parseStream)
+                .createSimpleMachine()
+
         assertEquals(FiniteXmlState("ready"), machine.state)
 
         // Transition with only a name
@@ -34,7 +28,6 @@ class BasicSCXMLStreamParserTest {
         BasicSCXMLStreamParser::class.java.getResource("microwave.xml")
                 .openStream()
                 .let(BasicSCXMLStreamParser()::parseStream)
-                .createRootMachine()
     }
 
 }
