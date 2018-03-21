@@ -27,9 +27,9 @@ class BaseMachineTest {
             )
     )
 
-    sealed class Energy : FiniteState {
-        object Kinetic : Energy()
-        object Potential : Energy()
+    sealed class Energy(override val id: String) : FiniteState {
+        object Kinetic : Energy("kinetic")
+        object Potential : Energy("potential")
     }
 
     sealed class EnergyTransition(override val event: String) : Transition {

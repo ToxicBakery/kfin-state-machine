@@ -9,28 +9,36 @@ import com.toxicbakery.kfinstatemachine.graph.GraphEdge
 import com.toxicbakery.kfinstatemachine.graph.GraphNode
 import com.toxicbakery.kfinstatemachine.xml.model.XmlRoot
 import com.toxicbakery.kfinstatemachine.xml.model.XmlState
-import com.toxicbakery.kfinstatemachine.xml.model.XmlTransition
+
+fun XmlRoot.createSimpleMachine() =
+        createSimpleMachineWithMapping(
+                stateMapper = { id -> FiniteXmlState(id) },
+                transitionMapper = { event -> FiniteXmlTransition(event) }
+        )
 
 /**
  * Create a simple machine from this root node.
  */
-fun XmlRoot.createSimpleMachine() = states
-                .flatMap { xmlState ->
-                    xmlState.transitions.map { xmlTransition ->
-                        GraphEdge(
-                                left = GraphNode(xmlState.toFinite),
-                                right = GraphNode(xmlTransition.targetState),
-                                label = FiniteXmlTransition(xmlTransition.event)
-                        )
-                    }
-                }
-                .toSet()
-                .let { edges: Set<GraphEdge<FiniteState, Transition>> ->
-                    XmlBaseMachine(
-                            directedGraph = DirectedGraph(edges),
-                            initialState = FiniteXmlState(initial)
-                    )
-                }
+fun <F : FiniteState, T : Transition> XmlRoot.createSimpleMachineWithMapping(
+        stateMapper: (id: String) -> F,
+        transitionMapper: (event: String) -> T
+): StateMachine<F, T> = states
+        .flatMap { xmlState ->
+            xmlState.transitions.map { xmlTransition ->
+                GraphEdge(
+                        left = GraphNode(stateMapper(xmlState.id)),
+                        right = GraphNode(stateMapper(xmlTransition.target)),
+                        label = transitionMapper(xmlTransition.event)
+                )
+            }
+        }
+        .toSet()
+        .let { edges: Set<GraphEdge<F, T>> ->
+            BaseMachine(
+                    directedGraph = DirectedGraph(edges),
+                    initialState = stateMapper(initial)
+            )
+        }
 
 /**
  * Create a parallel machine from this root node and all sub machines.
@@ -55,12 +63,3 @@ private fun XmlState.createParallelMachine(
             initialState = FiniteXmlState("")
     )
 }
-
-val XmlState.toFinite: FiniteXmlState
-    get() = FiniteXmlState(id)
-
-val XmlTransition.toFinite: FiniteXmlTransition
-    get() = FiniteXmlTransition(event)
-
-val XmlTransition.targetState: FiniteXmlState
-    get() = FiniteXmlState(target)
