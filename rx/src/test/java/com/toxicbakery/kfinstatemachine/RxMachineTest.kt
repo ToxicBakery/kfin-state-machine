@@ -48,11 +48,12 @@ class RxMachineTest {
                 )
         )
 
-        machine.stateObservable
+        val disposable = machine.stateObservable
                 .subscribe { energy: Energy -> assertEquals(expectedStates.poll(), energy) }
 
         machine.performTransition(Release)
         assertEquals(0, expectedStates.size)
+        disposable.dispose()
     }
 
     @Test
@@ -65,12 +66,13 @@ class RxMachineTest {
                 )
         )
 
-        machine.transitionObservable
+        val disposable = machine.transitionObservable
                 .subscribe { pair -> assertEquals(expectedTransitions.poll(), pair) }
 
         machine.performTransition(Release)
         machine.performTransition(Store)
         assertEquals(0, expectedTransitions.size)
+        disposable.dispose()
     }
 
 }
