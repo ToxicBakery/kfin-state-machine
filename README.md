@@ -6,33 +6,64 @@ Kotlin library for creating finite state machines.
 
 ## Sample Usage
 ```kotlin
-sealed class Energy(
-        override val transitions: Set<KClass<out FiniteState>>
-) : FiniteState {
-    object Potential : Energy(setOf(Kinetic::class))
-    object Kinetic : Energy(setOf(Potential::class))
+sealed class Energy(override val id: String) : FiniteState {
+    object Kinetic : Energy("kinetic")
+    object Potential : Energy("potential")
 }
 
-class Usage {
+sealed class EnergyTransition(override val event: String) : Transition {
+    object Store : EnergyTransition("Store")
+    object Release : EnergyTransition("Release")
+    object Invalid : EnergyTransition("Invalid")
+}
 
-    init {
-        val serializableStateMachine = SerializableStateMachine(Potential)
-        serializableStateMachine.transition(Kinetic)
+val machine = BaseMachine(
+    directedGraph = DirectedGraph(
+            edges = setOf(
+                    GraphEdge(
+                            left = GraphNode(Potential),
+                            right = GraphNode(Kinetic),
+                            label = Release
+                    ),
+                    GraphEdge(
+                            left = GraphNode(Kinetic),
+                            right = GraphNode(Potential),
+                            label = Store
+                    )
+            )
+    ),
+    initialState = Potential
+)
+
+// Get the current state, will initially return `Potential`
+machine.state
+
+// Move the machine to `Kinetic`
+machine.performTransition(Release)
+
+// Listen for transitions
+machine.addListener(object : TransitionListener<Energy, EnergyTransition> {
+    override fun onTransition(transition: EnergyTransition, target: Energy) {
+        // Perform work before the machine enters the new state
     }
-
-}
+})
 ```
 
 ## Install
 
-Core
+Core, includes directed graphs and base state machine implementation
 ```groovy
-compile "com.ToxicBakery.kfinstatemachine:core:1.0.20"
+compile "com.ToxicBakery.kfinstatemachine:core:2.+"
 ```
 
-Rx based machine, includes core dependency
+SCXML, includes core dependency
 ```groovy
-compile "com.ToxicBakery.kfinstatemachine:rx:1.0.20"
+compile "com.ToxicBakery.kfinstatemachine:scxml:2.+"
+```
+
+Rx support, includes core dependency
+```groovy
+compile "com.ToxicBakery.kfinstatemachine:rx:2.+"
 ```
 
 [1]:https://en.wikipedia.org/wiki/Finite-state_machine

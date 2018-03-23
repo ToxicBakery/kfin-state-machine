@@ -1,1 +1,4 @@
-include 'core', 'rx', 'test-classes'
+include ':core'
+include ':scxml'
+include ':rx'
+include ':benchmark'
