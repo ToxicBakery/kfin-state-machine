@@ -14,9 +14,10 @@ jmhReport {
     jmhReportOutput = project.file("$buildDir/jmh-report")
 }
 task runJMH(type: JavaExec) {
-    main = "com.toxicbakery.kfinstatemachine.MachineBenchmark"
-    classpath sourceSets.test.runtimeClasspath
+    main = "com.toxicbakery.kfinstatemachine.BenchmarkSuite"
+    classpath sourceSets.main.runtimeClasspath
 }
+tasks.runJMH.finalizedBy tasks.jmhReport
 tasks.jmhReport.dependsOn tasks.runJMH
 
 tasks.jmhReport.doFirst {
@@ -24,8 +25,9 @@ tasks.jmhReport.doFirst {
 }
 
 dependencies {
-    testCompile "org.openjdk.jmh:jmh-generator-annprocess:1.20"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 
+    compile "org.openjdk.jmh:jmh-generator-annprocess:1.20"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile project(":core")
 }
