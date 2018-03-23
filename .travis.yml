@@ -31,4 +31,8 @@ jobs:
       - echo -e "signing.keyId=${SIGNING_KEY}" >> "gradle.properties"
       - echo -e "signing.password=${SIGNING_PASSWORD}" >> "gradle.properties"
       - echo -e "signing.secretKeyRingFile=../maven.keystore.gpg" >> "gradle.properties"
-      - "docker run -it -v $PWD:/workspace $DOCKER_IMAGE /bin/sh -c \"cd /workspace && ./gradlew uploadArchives\""
+      - echo -e "SONATYPE_USERNAME=${SONATYPE_USERNAME}" >> docker.env
+      - echo -e "SONATYPE_PASSWORD=${SONATYPE_PASSWORD}" >> docker.env
+      - echo -e "TRAVIS_TAG=${TRAVIS_TAG}" >> docker.env
+      - echo -e "TRAVIS_BUILD_NUMBER=${TRAVIS_BUILD_NUMBER}" >> docker.env
+      - "docker run -it --env-file docker.env -v $PWD:/workspace $DOCKER_IMAGE /bin/sh -c \"cd /workspace && ./gradlew uploadArchives\""
