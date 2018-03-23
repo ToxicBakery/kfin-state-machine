@@ -12,14 +12,14 @@ class GraphBuilderKtTest {
         assertEquals(
                 setOf(
                         GraphEdge(
-                                left = GraphNode("node_1"),
-                                right = GraphNode("node_2"),
-                                label = "edge_1"
+                                left = GraphNode(TestFiniteState("node_1")),
+                                right = GraphNode(TestFiniteState("node_2")),
+                                label = TestTransition("edge_1")
                         ),
                         GraphEdge(
-                                left = GraphNode("node_2"),
-                                right = GraphNode("node_3"),
-                                label = "edge_2"
+                                left = GraphNode(TestFiniteState("node_2")),
+                                right = GraphNode(TestFiniteState("node_3")),
+                                label = TestTransition("edge_2")
                         )
                 ),
                 createGraphEdges(2)
