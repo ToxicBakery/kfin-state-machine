@@ -1,0 +1,31 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'idea'
+apply plugin: "me.champeau.gradle.jmh"
+apply plugin: "io.morethan.jmhreport"
+
+repositories {
+    jcenter()
+    maven { url "https://plugins.gradle.org/m2" }
+}
+
+jmhReport {
+    jmhResultPath = project.file("$buildDir/jmh-result.json")
+    jmhReportOutput = project.file("$buildDir/jmh-report")
+}
+task runJMH(type: JavaExec) {
+    main = "com.toxicbakery.kfinstatemachine.MachineBenchmark"
+    classpath sourceSets.test.runtimeClasspath
+}
+tasks.jmhReport.dependsOn tasks.runJMH
+
+tasks.jmhReport.doFirst {
+    file("$buildDir/jmh-report").mkdirs()
+}
+
+dependencies {
+    testCompile "org.openjdk.jmh:jmh-generator-annprocess:1.20"
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile project(":core")
+}
