@@ -23,7 +23,7 @@ stages:
 jobs:
   include:
     - stage: compile
-      script: "docker run -it -v $PWD:/workspace $DOCKER_IMAGE /bin/sh -c \"cd /workspace && ./gradlew clean test\""
+      script: "docker run -it -v $PWD:/workspace $DOCKER_IMAGE /bin/sh -c \"cd /workspace && ./gradlew clean test dokka\""
     - stage: deploy
       script:
       - openssl aes-256-cbc -K $encrypted_f3f9bf37f66c_key -iv $encrypted_f3f9bf37f66c_iv
