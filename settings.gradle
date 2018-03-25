@@ -2,3 +2,6 @@ include ':core'
 include ':scxml'
 include ':rx'
 include ':benchmark'
+
+// Samples
+include ':samples:dungeon'

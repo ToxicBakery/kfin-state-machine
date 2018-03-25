@@ -11,6 +11,11 @@ interface StateMachine<out F : FiniteState, T : Transition> {
     val state: F
 
     /**
+     * Transitions available to the current state.
+     */
+    val availableTransitions: Set<T>
+
+    /**
      * Add a listener to be notified before a machine enters a new state.
      */
     fun addListener(listener: TransitionListener<F, T>)
