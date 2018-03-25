@@ -16,6 +16,9 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     override val state: F
         get() = node.value
 
+    override val availableTransitions: Set<T>
+        get() = directedGraph.nodeTransitions(node)
+
     override fun addListener(listener: TransitionListener<F, T>) {
         listeners.add(listener)
     }
@@ -25,29 +28,40 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     }
 
     override fun performTransitionByName(event: String) {
-        getMatchingNodeByTransitionName(event)
-                .label
-                .let(this::performTransition)
+        findMatchingEdgeByTransitionName(event)
+                .also { edge: GraphEdge<F, T> ->
+                    moveToNode(
+                            transition = edge.label,
+                            nextNode = edge.right)
+                }
     }
 
     override fun performTransition(transition: T) {
-        node = findNextNode(transition)
-                .let { it: GraphEdge<F, T> -> it.right }
-                .also { nextNode: GraphNode<F> -> notifyListeners(transition, nextNode.value) }
+        findMatchingEdgeByTransition(transition)
+                .also { edge: GraphEdge<F, T> ->
+                    moveToNode(
+                            transition = edge.label,
+                            nextNode = edge.right)
+                }
     }
 
-    protected fun findNextNode(transition: T) =
+    protected fun moveToNode(transition: T, nextNode: GraphNode<F>) {
+        notifyListeners(transition, nextNode.value)
+        node = nextNode
+    }
+
+    protected fun findMatchingEdgeByTransition(transition: T) =
             directedGraph.exitingEdgesForNodeValue(state)
-                    .find { it.label == transition }
+                    .find { it.label.event == transition.event }
                     ?: throw Exception("Illegal transition $transition for $state")
+
+    protected fun findMatchingEdgeByTransitionName(event: String): GraphEdge<F, T> =
+            directedGraph.exitingEdgesForNodeValue(state)
+                    .singleOrNull { it.label.event == event }
+                    ?: throw Exception("""Undefined event $event for state ${node.value}.
+                        Valid events: ${directedGraph.nodeTransitions(node).joinToString { it.event }}""")
 
     protected fun notifyListeners(transition: T, nextState: F) =
             listeners.forEach { transitionListener -> transitionListener.onTransition(transition, nextState) }
-
-    private fun getMatchingNodeByTransitionName(event: String) =
-            directedGraph.edges
-                    .singleOrNull { it.left == node && it.label.event == event }
-                    ?: throw Exception("""Undefined event $event for state ${node.value}.
-                        Valid events: ${directedGraph.nodeTransitions(node).joinToString { it.event }}""")
 
 }
