@@ -21,13 +21,13 @@ val machine = BaseMachine(
     directedGraph = DirectedGraph(
             edges = setOf(
                     GraphEdge(
-                            left = GraphNode(Potential),
-                            right = GraphNode(Kinetic),
+                            left = Potential,
+                            right = Kinetic,
                             label = Release
                     ),
                     GraphEdge(
-                            left = GraphNode(Kinetic),
-                            right = GraphNode(Potential),
+                            left = Kinetic,
+                            right = Potential,
                             label = Store
                     )
             )

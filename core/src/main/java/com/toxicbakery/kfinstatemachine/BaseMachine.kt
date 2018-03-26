@@ -1,7 +1,6 @@
 package com.toxicbakery.kfinstatemachine
 
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
-import com.toxicbakery.kfinstatemachine.graph.GraphNode
 import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.exitingEdgesForNodeValue
 
@@ -10,11 +9,11 @@ open class BaseMachine<F : FiniteState, T : Transition>(
         initialState: F
 ) : StateMachine<F, T> {
 
-    private var node: GraphNode<F> = directedGraph.nodes.first { it.value == initialState }
+    private var node: F = directedGraph.nodes.first { it == initialState }
     private val listeners: MutableSet<TransitionListener<F, T>> = hashSetOf()
 
     override val state: F
-        get() = node.value
+        get() = node
 
     override val availableTransitions: Set<T>
         get() = directedGraph.nodeTransitions(node)
@@ -45,8 +44,8 @@ open class BaseMachine<F : FiniteState, T : Transition>(
                 }
     }
 
-    protected fun moveToNode(transition: T, nextNode: GraphNode<F>) {
-        notifyListeners(transition, nextNode.value)
+    protected fun moveToNode(transition: T, nextNode: F) {
+        notifyListeners(transition, nextNode)
         node = nextNode
     }
 
@@ -58,7 +57,7 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     protected fun findMatchingEdgeByTransitionName(event: String): GraphEdge<F, T> =
             directedGraph.exitingEdgesForNodeValue(state)
                     .singleOrNull { it.label.event == event }
-                    ?: throw Exception("""Undefined event $event for state ${node.value}.
+                    ?: throw Exception("""Undefined event $event for state $node.
                         Valid events: ${directedGraph.nodeTransitions(node).joinToString { it.event }}""")
 
     protected fun notifyListeners(transition: T, nextState: F) =

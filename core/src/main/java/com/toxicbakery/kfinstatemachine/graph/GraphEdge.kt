@@ -1,7 +1,7 @@
 package com.toxicbakery.kfinstatemachine.graph
 
-data class GraphEdge<out V, out L>(
-        val left: GraphNode<V>,
-        val right: GraphNode<V>,
+data class GraphEdge<out N, out L>(
+        val left: N,
+        val right: N,
         val label: L
 )

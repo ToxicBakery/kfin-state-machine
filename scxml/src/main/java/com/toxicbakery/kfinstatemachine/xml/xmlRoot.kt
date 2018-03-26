@@ -6,7 +6,6 @@ import com.toxicbakery.kfinstatemachine.StateMachine
 import com.toxicbakery.kfinstatemachine.Transition
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
-import com.toxicbakery.kfinstatemachine.graph.GraphNode
 import com.toxicbakery.kfinstatemachine.xml.model.XmlRoot
 import com.toxicbakery.kfinstatemachine.xml.model.XmlState
 
@@ -26,8 +25,8 @@ fun <F : FiniteState, T : Transition> XmlRoot.createSimpleMachineWithMapping(
         .flatMap { xmlState ->
             xmlState.transitions.map { xmlTransition ->
                 GraphEdge(
-                        left = GraphNode(stateMapper(xmlState.id)),
-                        right = GraphNode(stateMapper(xmlTransition.target)),
+                        left = stateMapper(xmlState.id),
+                        right = stateMapper(xmlTransition.target),
                         label = transitionMapper(xmlTransition.event)
                 )
             }
