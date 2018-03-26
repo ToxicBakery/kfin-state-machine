@@ -3,28 +3,33 @@ package com.toxicbakery.kfinstatemachine
 import io.reactivex.Maybe
 import io.reactivex.Observable
 
+/**
+ * Streams the current state of the machine and future state changes.
+ */
 val <F : FiniteState, T : Transition> StateMachine<F, T>.stateObservable: Observable<F>
     get() = createObservableTransitionListener(
             init = Maybe.just(state),
-            callback = { _, target -> target })
+            callback = { transitionEvent -> transitionEvent.targetState })
 
-val <F : FiniteState, T : Transition> StateMachine<F, T>.transitionObservable: Observable<Pair<T, F>>
+/**
+ * Streams machine transition changes.
+ */
+val <F : FiniteState, T : Transition> StateMachine<F, T>.transitionObservable: Observable<TransitionEvent<F, T>>
     get() = createObservableTransitionListener(
-            callback = { transition, target -> Pair(transition, target) })
+            callback = { transitionEvent -> transitionEvent })
 
+/**
+ * Utility method for creating an observable from a machine callback.
+ * The callback is unregistered when the stream is disposed.
+ *
+ * @param init optional initial value to pass through the stream
+ * @param callback handler for sending callbacks through the stream
+ */
 fun <F : FiniteState, T : Transition, O> StateMachine<F, T>.createObservableTransitionListener(
         init: Maybe<O> = Maybe.empty(),
-        callback: (transition: T, target: F) -> O
+        callback: (transitionEvent: TransitionEvent<F, T>) -> O
 ): Observable<O> = Observable.create { emitter ->
-    object : TransitionListener<F, T> {
-        override fun onTransition(transition: T, target: F) {
-            emitter.onNext(callback(transition, target))
-        }
-    }.also { listener ->
-        init.subscribe(emitter::onNext)
-        addListener(listener)
-        emitter.setCancellable {
-            removeListener(listener)
-        }
-    }
+    init.subscribe(emitter::onNext)
+    addListener({ transitionEvent -> emitter.onNext(callback(transitionEvent)) })
+            .also { listener -> emitter.setCancellable { removeListener(listener) } }
 }

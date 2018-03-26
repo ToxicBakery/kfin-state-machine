@@ -60,13 +60,13 @@ class RxMachineTest {
         val machine = BaseMachine(energyDirectedGraph, Potential)
         val expectedTransitions = LinkedList(
                 listOf(
-                        Pair(Release, Kinetic),
-                        Pair(Store, Potential)
+                        TransitionEvent(Release, Kinetic),
+                        TransitionEvent(Store, Potential)
                 )
         )
 
         val disposable = machine.transitionObservable
-                .subscribe { pair -> assertEquals(expectedTransitions.poll(), pair) }
+                .subscribe { transitionEvent -> assertEquals(expectedTransitions.poll(), transitionEvent) }
 
         machine.performTransition(Release)
         machine.performTransition(Store)

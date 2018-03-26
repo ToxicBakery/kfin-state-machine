@@ -58,7 +58,7 @@ private fun XmlState.createParallelMachine(
 ) {
     states.forEach { }
     namedMachines[id] = BaseMachine(
-            directedGraph = DirectedGraph(setOf()),
+            directedGraph = DirectedGraph<FiniteState, Transition>(setOf()),
             initialState = FiniteXmlState("")
     )
 }

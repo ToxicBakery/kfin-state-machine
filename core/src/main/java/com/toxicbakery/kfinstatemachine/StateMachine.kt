@@ -3,7 +3,7 @@ package com.toxicbakery.kfinstatemachine
 /**
  * State machine interface that requires the ability to transition finite states.
  */
-interface StateMachine<out F : FiniteState, T : Transition> {
+interface StateMachine<F : FiniteState, T : Transition> {
 
     /**
      * Current state of the machine.
@@ -16,14 +16,16 @@ interface StateMachine<out F : FiniteState, T : Transition> {
     val availableTransitions: Set<T>
 
     /**
-     * Add a listener to be notified before a machine enters a new state.
+     * Add a listener to be notified before a machine enters a new state. The listener is returned for convenience.
      */
-    fun addListener(listener: TransitionListener<F, T>)
+    fun addListener(
+            listener: (transitionEvent: TransitionEvent<F, T>) -> Unit
+    ): (transitionEvent: TransitionEvent<F, T>) -> Unit
 
     /**
      * Remove a previously added listener.
      */
-    fun removeListener(listener: TransitionListener<F, T>)
+    fun removeListener(listener: (transitionEvent: TransitionEvent<F, T>) -> Unit)
 
     /**
      * Transition the machine.
