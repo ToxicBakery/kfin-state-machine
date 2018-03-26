@@ -95,11 +95,7 @@ class BaseMachineTest {
         )
 
         val semaphore = Semaphore(0)
-        val listener = object : TransitionListener<Energy, EnergyTransition> {
-            override fun onTransition(transition: EnergyTransition, target: Energy) = semaphore.release()
-        }
-
-        machine.addListener(listener)
+        val listener = machine.addListener({ _ -> semaphore.release() })
         machine.performTransition(Release)
         assertTrue(semaphore.tryAcquire())
 

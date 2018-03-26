@@ -9,7 +9,7 @@ open class BaseMachine<F : FiniteState, T : Transition>(
 ) : StateMachine<F, T> {
 
     private var node: F = directedGraph.nodes.first { it == initialState }
-    private val listeners: MutableSet<TransitionListener<F, T>> = hashSetOf()
+    private val listeners: MutableSet<(transitionEvent: TransitionEvent<F, T>) -> Unit> = hashSetOf()
 
     override val state: F
         get() = node
@@ -17,11 +17,12 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     override val availableTransitions: Set<T>
         get() = directedGraph.nodeTransitions(node)
 
-    override fun addListener(listener: TransitionListener<F, T>) {
-        listeners.add(listener)
-    }
+    override fun addListener(
+            listener: (transitionEvent: TransitionEvent<F, T>) -> Unit
+    ): (transitionEvent: TransitionEvent<F, T>) -> Unit =
+            listener.apply { listeners.add(this) }
 
-    override fun removeListener(listener: TransitionListener<F, T>) {
+    override fun removeListener(listener: (transitionEvent: TransitionEvent<F, T>) -> Unit) {
         listeners.remove(listener)
     }
 
@@ -54,6 +55,8 @@ open class BaseMachine<F : FiniteState, T : Transition>(
                     ?: throw Exception("Invalid transition $event for current state $node")
 
     protected open fun notifyListeners(transition: T, nextState: F) =
-            listeners.forEach { transitionListener -> transitionListener.onTransition(transition, nextState) }
+            listeners.forEach { transitionListener ->
+                transitionListener(TransitionEvent(transition, nextState))
+            }
 
 }
