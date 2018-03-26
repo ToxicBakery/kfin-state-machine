@@ -1,18 +1,19 @@
 package com.toxicbakery.sample.dungeon
 
 import com.toxicbakery.kfinstatemachine.StateMachine
+import java.io.PrintStream
 
 fun main(args: Array<String>) {
-    val application = Application()
-    System.console()
-            ?.apply {
-                while (true) {
-                    if (!application.gameLoopProcessor(readLine())) break
-                }
-            }
+    Application().apply {
+        System.console()?.apply {
+            while (true) if (gameLoopProcessor(readLine())) break
+        }
+    }
 }
 
-class Application {
+class Application(
+        private val outputPrintStream: PrintStream = System.out
+) {
 
     private val machine: StateMachine<Point, Label> =
             MapGenerator(dimensions = MAP_SIZE)
@@ -26,27 +27,36 @@ class Application {
     private val exploration = Exploration(MAP_SIZE, VIEWABLE_SIZE)
             .apply { addExploredPoint(machine.state) }
 
+    private val allDirections = Direction.DIRECTIONS.joinToString { it.shortId }
+
     init {
         look()
     }
 
+    /**
+     * Attempt to execute a given command against the game.
+     * @return true if the game should exit
+     */
     fun gameLoopProcessor(command: String): Boolean {
         when {
-            command == "exit" -> return false
+            command == "exit" -> return true
             command.startsWith("walk") -> walk(command.removePrefix("walk").trim())
             else -> help()
         }
 
-        exploration.printMap(machine.state)
+        println(exploration.printMap(machine.state))
         look()
         println()
-        return true
+        return false
     }
 
     private fun walk(direction: String) {
-        when (direction) {
-            "n", "s", "e", "w" -> doWalk(direction)
-            else -> println("Invalid direction, expecting n, s, e, or w")
+        try {
+            Direction.fromString(direction.substring(0, 1))
+                    .let(Direction::shortId)
+                    .also(::doWalk)
+        } catch (e: Exception) {
+            println("Invalid direction, expecting $allDirections")
         }
     }
 
@@ -78,11 +88,13 @@ class Application {
     private fun help() {
         println("""
                 Available Commands:
-                walk [n,s,e,w] - Walk in a cardinal direction
+                walk [$allDirections] - Walk in a cardinal direction
                 help
                 exit
                 """.trimIndent())
     }
+
+    private fun println(message: String = "") = outputPrintStream.println(message)
 
     companion object {
         private const val MAP_SIZE: Int = 20

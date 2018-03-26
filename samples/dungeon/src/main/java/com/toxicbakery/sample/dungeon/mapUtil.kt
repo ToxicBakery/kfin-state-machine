@@ -3,9 +3,10 @@ package com.toxicbakery.sample.dungeon
 import com.toxicbakery.kfinstatemachine.BaseMachine
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
+import com.toxicbakery.sample.dungeon.Direction.*
+import com.toxicbakery.sample.dungeon.Direction.Companion.DIRECTIONS
 import java.util.*
 
-private val directions = arrayOf("n", "s", "w", "e")
 private val invalidPoint = Point(-1, -1)
 
 fun mapToDirectedGraph(map: Array<Array<Boolean>>): BaseMachine<Point, Label> {
@@ -36,13 +37,12 @@ private fun createEdges(
         point: Point
 ): MutableSet<GraphEdge<Point, Label>> = mutableSetOf<GraphEdge<Point, Label>>()
         .also { edges ->
-            directions.forEach { direction ->
+            DIRECTIONS.forEach { direction: Direction ->
                 when (direction) {
-                    "n" -> point.copy(y = wrapPosition(map, point.y - 1))
-                    "s" -> point.copy(y = wrapPosition(map, point.y + 1))
-                    "w" -> point.copy(x = wrapPosition(map, point.x - 1))
-                    "e" -> point.copy(x = wrapPosition(map, point.x + 1))
-                    else -> invalidPoint
+                    North -> point.copy(y = wrapPosition(map, point.y - 1))
+                    South -> point.copy(y = wrapPosition(map, point.y + 1))
+                    West -> point.copy(x = wrapPosition(map, point.x - 1))
+                    East -> point.copy(x = wrapPosition(map, point.x + 1))
                 }.also { target ->
                     if (target != invalidPoint
                             && targetIsValid(map, target))
@@ -59,12 +59,12 @@ private fun targetIsValid(
 private fun createEdge(
         start: Point,
         destination: Point,
-        direction: String
+        direction: Direction
 ): GraphEdge<Point, Label> =
         GraphEdge(
                 left = start,
                 right = destination,
-                label = Label(direction)
+                label = Label(direction.shortId)
         )
 
 private fun wrapPosition(map: Array<Array<Boolean>>, y: Int): Int =

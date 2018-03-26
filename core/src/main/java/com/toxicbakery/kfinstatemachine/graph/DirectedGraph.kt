@@ -1,17 +1,21 @@
 package com.toxicbakery.kfinstatemachine.graph
 
-data class DirectedGraph<N, out E>(
-        override val edges: Set<GraphEdge<N, E>>
-) : IDirectedGraph<N, E> {
+data class DirectedGraph<N, out L>(
+        override val edges: Set<GraphEdge<N, L>>
+) : IDirectedGraph<N, L> {
 
-    override val nodes: Set<N> = edges.flatMap { setOf(it.left, it.right) }
-            .toSet()
+    override val mappedEdges: Map<N, List<GraphEdge<N, L>>> =
+            edges.groupBy { it.left }
+
+    override val nodes: Set<N> =
+            edges.flatMap { setOf(it.left, it.right) }
+                    .toSet()
 
     init {
         edges.groupBy { Pair(it.left, it.label) }
                 .map { it.value }
                 .firstOrNull { it.size > 1 }
-                ?.let { offendingEdges: List<GraphEdge<N, E>> ->
+                ?.let { offendingEdges: List<GraphEdge<N, L>> ->
                     val (leftNode, label) = offendingEdges.first()
                             .let { Pair(it.left, it.label) }
                     val ambiguousNodes = offendingEdges.map { it.right }
@@ -19,5 +23,13 @@ data class DirectedGraph<N, out E>(
                     Destination nodes found $ambiguousNodes""")
                 }
     }
+
+    override fun nodeTransitions(node: N): Set<L> =
+            getEdgesForNode(node)
+                    .map { it.label }
+                    .toSet()
+
+    private fun getEdgesForNode(node: N): List<GraphEdge<N, L>> =
+            mappedEdges[node] ?: throw Exception("Node not in graph.")
 
 }

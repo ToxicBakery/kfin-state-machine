@@ -1,13 +1,12 @@
 package com.toxicbakery.kfinstatemachine.graph
 
-interface IDirectedGraph<N, out E> {
+interface IDirectedGraph<N, out L> {
     val nodes: Set<N>
 
-    val edges: Set<GraphEdge<N, E>>
+    val edges: Set<GraphEdge<N, L>>
 
-    fun nodeTransitions(node: N): Set<E> =
-            edges.filter { it.left == node }
-                    .map { it.label }
-                    .toSet()
+    val mappedEdges: Map<N, List<GraphEdge<N, L>>>
+
+    fun nodeTransitions(node: N): Set<L>
 
 }

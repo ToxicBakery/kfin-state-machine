@@ -30,32 +30,39 @@ class Exploration(
         exploredArea[point.x][point.y] = true
     }
 
-    fun printMap(currentLocation: Point) {
-        printCap()
+    fun printMap(currentLocation: Point): String {
+        val sb = StringBuilder()
+        printCap(sb)
         for (y in -halfViewableSize..halfViewableSize) {
-            print("|")
+            sb.append("|")
             for (x in -halfViewableSize..halfViewableSize) {
-                printMapPoint(currentLocation, Point(currentLocation.x + x, currentLocation.y + y).translate)
+                Point(currentLocation.x + x, currentLocation.y + y).translate
+                        .also { translatedPoint ->
+                            printMapPoint(
+                                    currentLocation = currentLocation,
+                                    plotLocation = translatedPoint)
+                                    .also { sb.append(it) }
+                        }
             }
-            println("|")
+            sb.appendln("|")
         }
-        printCap()
+        printCap(sb)
+        return sb.toString()
     }
 
-    private fun printCap() {
+    private fun printCap(stringBuilder: StringBuilder) {
         for (i in 0 until viewableSize + 2) {
-            if (i == 0 || viewableSize + 1 == i) print("+")
-            else print("---")
+            if (i == 0 || viewableSize + 1 == i) stringBuilder.append("+")
+            else stringBuilder.append("---")
         }
-        println()
+        stringBuilder.appendln()
     }
 
     private fun printMapPoint(
             currentLocation: Point,
             plotLocation: Point
-    ) {
-        if (currentLocation == plotLocation) print(" x ")
-        else print(exploredArea[plotLocation.x][plotLocation.y].mapRepresentation)
-    }
+    ): String =
+            if (currentLocation == plotLocation) " x "
+            else exploredArea[plotLocation.x][plotLocation.y].mapRepresentation
 
 }

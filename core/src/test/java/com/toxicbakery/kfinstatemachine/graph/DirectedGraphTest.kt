@@ -14,9 +14,12 @@ class DirectedGraphTest {
                         label = "edge_1"
                 ))
 
-        DirectedGraph(edges)
-                .exitingEdgesForNodeValue("node_1")
-                .let { assertEquals(edges, it) }
+        (DirectedGraph(edges)
+                .mappedEdges["node_1"] ?: listOf())
+                .toSet()
+                .let { it: Set<GraphEdge<String, String>> ->
+                    assertEquals(edges, it)
+                }
     }
 
     @Test
@@ -38,6 +41,23 @@ class DirectedGraphTest {
             fail("Expected exception for ambiguous edges.")
         } catch (e: Exception) {
             assertTrue(e.message!!.startsWith("Ambiguous edges detected for "))
+        }
+    }
+
+    @Test
+    fun nodeNotInGraph() {
+        val edges = setOf(
+                GraphEdge(
+                        left = "node_1",
+                        right = "node_2",
+                        label = "edge_1"
+                ))
+
+        try {
+            DirectedGraph(edges)
+                    .nodeTransitions("node_3")
+        } catch (e: Exception) {
+            assertTrue(e.message!! == "Node not in graph.")
         }
     }
 

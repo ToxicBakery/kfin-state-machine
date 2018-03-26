@@ -2,7 +2,6 @@ package com.toxicbakery.kfinstatemachine
 
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
 import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
-import com.toxicbakery.kfinstatemachine.graph.exitingEdgesForNodeValue
 
 open class BaseMachine<F : FiniteState, T : Transition>(
         private val directedGraph: IDirectedGraph<F, T>,
@@ -27,7 +26,7 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     }
 
     override fun performTransitionByName(event: String) {
-        findMatchingEdgeByTransitionName(event)
+        edgeForTransitionName(event)
                 .also { edge: GraphEdge<F, T> ->
                     moveToNode(
                             transition = edge.label,
@@ -36,7 +35,7 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     }
 
     override fun performTransition(transition: T) {
-        findMatchingEdgeByTransition(transition)
+        edgeForTransitionName(transition.event)
                 .also { edge: GraphEdge<F, T> ->
                     moveToNode(
                             transition = edge.label,
@@ -44,23 +43,17 @@ open class BaseMachine<F : FiniteState, T : Transition>(
                 }
     }
 
-    protected fun moveToNode(transition: T, nextNode: F) {
+    protected open fun moveToNode(transition: T, nextNode: F) {
         notifyListeners(transition, nextNode)
         node = nextNode
     }
 
-    protected fun findMatchingEdgeByTransition(transition: T) =
-            directedGraph.exitingEdgesForNodeValue(state)
-                    .find { it.label.event == transition.event }
-                    ?: throw Exception("Illegal transition $transition for $state")
+    protected open fun edgeForTransitionName(event: String): GraphEdge<F, T> =
+            directedGraph.mappedEdges[node]
+                    ?.find { edge -> edge.label.event == event }
+                    ?: throw Exception("Invalid transition $event for current state $node")
 
-    protected fun findMatchingEdgeByTransitionName(event: String): GraphEdge<F, T> =
-            directedGraph.exitingEdgesForNodeValue(state)
-                    .singleOrNull { it.label.event == event }
-                    ?: throw Exception("""Undefined event $event for state $node.
-                        Valid events: ${directedGraph.nodeTransitions(node).joinToString { it.event }}""")
-
-    protected fun notifyListeners(transition: T, nextState: F) =
+    protected open fun notifyListeners(transition: T, nextState: F) =
             listeners.forEach { transitionListener -> transitionListener.onTransition(transition, nextState) }
 
 }
