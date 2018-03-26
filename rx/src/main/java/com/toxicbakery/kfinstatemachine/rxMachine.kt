@@ -12,9 +12,9 @@ val <F : FiniteState, T : Transition> StateMachine<F, T>.transitionObservable: O
     get() = createObservableTransitionListener(
             callback = { transition, target -> Pair(transition, target) })
 
-inline fun <F : FiniteState, T : Transition, O> StateMachine<F, T>.createObservableTransitionListener(
+fun <F : FiniteState, T : Transition, O> StateMachine<F, T>.createObservableTransitionListener(
         init: Maybe<O> = Maybe.empty(),
-        crossinline callback: (transition: T, target: F) -> O
+        callback: (transition: T, target: F) -> O
 ): Observable<O> = Observable.create { emitter ->
     object : TransitionListener<F, T> {
         override fun onTransition(transition: T, target: F) {

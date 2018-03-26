@@ -12,7 +12,7 @@ class ExplorationTest {
         exploration.addExploredPoint(Point(2, 1))
         exploration.addExploredPoint(Point(2, 19))
 
-        exploration.printMap(Point(2, 19))
+        println(exploration.printMap(Point(2, 19)))
     }
 
 }

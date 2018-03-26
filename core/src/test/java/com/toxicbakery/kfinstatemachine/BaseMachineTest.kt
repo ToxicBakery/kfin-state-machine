@@ -70,7 +70,10 @@ class BaseMachineTest {
             machine.performTransitionByName("Invalid")
             fail("Expected exception caused by invalid name.")
         } catch (e: Exception) {
-            assertTrue(e.message!!.startsWith("Undefined event Invalid for state "))
+            assertEquals(
+                    "Invalid transition Invalid for current state $Potential",
+                    e.message
+            )
         }
     }
 
@@ -103,6 +106,19 @@ class BaseMachineTest {
         machine.removeListener(listener)
         machine.performTransition(Store)
         assertFalse(semaphore.tryAcquire())
+    }
+
+    @Test
+    fun availableTransitions() {
+        val machine = BaseMachine(
+                directedGraph = directedGraph,
+                initialState = Potential
+        )
+
+        assertEquals(
+                setOf(Release),
+                machine.availableTransitions
+        )
     }
 
 }
