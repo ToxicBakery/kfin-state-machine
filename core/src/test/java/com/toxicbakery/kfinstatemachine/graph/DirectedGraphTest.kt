@@ -9,8 +9,8 @@ class DirectedGraphTest {
     fun rightEdgesForValue() {
         val edges = setOf(
                 GraphEdge(
-                        left = GraphNode("node_1"),
-                        right = GraphNode("node_2"),
+                        left = "node_1",
+                        right = "node_2",
                         label = "edge_1"
                 ))
 
@@ -23,13 +23,13 @@ class DirectedGraphTest {
     fun ambiguousNodes() {
         val edges = setOf(
                 GraphEdge(
-                        left = GraphNode("node_1"),
-                        right = GraphNode("node_2"),
+                        left = "node_1",
+                        right = "node_2",
                         label = "edge_1"
                 ),
                 GraphEdge(
-                        left = GraphNode("node_1"),
-                        right = GraphNode("node_3"),
+                        left = "node_1",
+                        right = "node_3",
                         label = "edge_1"
                 ))
 

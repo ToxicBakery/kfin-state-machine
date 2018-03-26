@@ -6,7 +6,6 @@ import com.toxicbakery.kfinstatemachine.RxMachineTest.EnergyTransition.Release
 import com.toxicbakery.kfinstatemachine.RxMachineTest.EnergyTransition.Store
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
-import com.toxicbakery.kfinstatemachine.graph.GraphNode
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.*
@@ -26,13 +25,13 @@ class RxMachineTest {
     private val energyDirectedGraph = DirectedGraph(
             edges = setOf(
                     GraphEdge(
-                            left = GraphNode(Potential),
-                            right = GraphNode(Kinetic),
+                            left = Potential,
+                            right = Kinetic,
                             label = Release
                     ),
                     GraphEdge(
-                            left = GraphNode(Kinetic),
-                            right = GraphNode(Potential),
+                            left = Kinetic,
+                            right = Potential,
                             label = Store
                     )
             )

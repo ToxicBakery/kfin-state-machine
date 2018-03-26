@@ -5,7 +5,6 @@ import com.toxicbakery.kfinstatemachine.BaseMachineTest.Energy.Potential
 import com.toxicbakery.kfinstatemachine.BaseMachineTest.EnergyTransition.*
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
-import com.toxicbakery.kfinstatemachine.graph.GraphNode
 import org.junit.Assert.*
 import org.junit.Test
 import java.util.concurrent.Semaphore
@@ -15,13 +14,13 @@ class BaseMachineTest {
     private val directedGraph = DirectedGraph(
             edges = setOf(
                     GraphEdge(
-                            left = GraphNode(Potential),
-                            right = GraphNode(Kinetic),
+                            left = Potential,
+                            right = Kinetic,
                             label = Release
                     ),
                     GraphEdge(
-                            left = GraphNode(Kinetic),
-                            right = GraphNode(Potential),
+                            left = Kinetic,
+                            right = Potential,
                             label = Store
                     )
             )

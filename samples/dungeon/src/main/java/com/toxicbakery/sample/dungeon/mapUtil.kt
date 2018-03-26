@@ -3,7 +3,6 @@ package com.toxicbakery.sample.dungeon
 import com.toxicbakery.kfinstatemachine.BaseMachine
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
-import com.toxicbakery.kfinstatemachine.graph.GraphNode
 import java.util.*
 
 private val directions = arrayOf("n", "s", "w", "e")
@@ -29,7 +28,6 @@ fun mapToDirectedGraph(map: Array<Array<Boolean>>): BaseMachine<Point, Label> {
                     .nextInt(edges.size)
                     .let(edges::elementAt)
                     .left
-                    .value
     )
 }
 
@@ -64,8 +62,8 @@ private fun createEdge(
         direction: String
 ): GraphEdge<Point, Label> =
         GraphEdge(
-                left = GraphNode(start),
-                right = GraphNode(destination),
+                left = start,
+                right = destination,
                 label = Label(direction)
         )
 
