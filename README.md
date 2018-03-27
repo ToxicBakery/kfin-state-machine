@@ -1,4 +1,4 @@
-# Kotlin Finite State Machine [![Build Status](https://travis-ci.org/ToxicBakery/kfin-state-machine.svg?branch=master)](https://travis-ci.org/ToxicBakery/kfin-state-machine)
+# Kotlin Finite State Machine [![Build Status](https://travis-ci.org/ToxicBakery/kfin-state-machine.svg?branch=master)](https://travis-ci.org/ToxicBakery/kfin-state-machine) [![codecov](https://codecov.io/gh/ToxicBakery/kfin-state-machine/branch/master/graph/badge.svg)](https://codecov.io/gh/ToxicBakery/kfin-state-machine)
 Kotlin library for creating finite state machines.
 
 > It is an abstract machine that can be in exactly one of a finite number of states at any given time. The FSM can change from one state to another in response to some external inputs; the change from one state to another is called a transition. An FSM is defined by a list of its states, its initial state, and the conditions for each transition.  
