@@ -1,8 +1,5 @@
-# Kotlin Finite State Machine [![Build Status](https://travis-ci.org/ToxicBakery/kfin-state-machine.svg?branch=master)](https://travis-ci.org/ToxicBakery/kfin-state-machine)
-Kotlin library for creating finite state machines.
-
-> It is an abstract machine that can be in exactly one of a finite number of states at any given time. The FSM can change from one state to another in response to some external inputs; the change from one state to another is called a transition. An FSM is defined by a list of its states, its initial state, and the conditions for each transition.  
-> &mdash; [Wikipedia - Finite-state machine][1]
+# Core
+Core library providing a base state machine implementation and graph features for building machines.
 
 ## Sample Usage
 ```kotlin
@@ -48,31 +45,8 @@ machine.addListener(object : TransitionListener<Energy, EnergyTransition> {
 })
 ```
 
-## Samples
-Samples intend to show various ways the library might be used.
-
- * [Dungeon](samples/dungeon) - MUD style application allowing a player to explore a randomly generated dungeon
-
 ## Install
-[Core](core) - includes directed graphs and base state machine implementation
+Includes directed graphs and base state machine implementation
 ```groovy
 compile "com.ToxicBakery.kfinstatemachine:core:2.+"
 ```
-
-[RxJava](rx) - includes [Core](core) dependency
-```groovy
-compile "com.ToxicBakery.kfinstatemachine:rx:2.+"
-```
-
-#### Experimental
-[SCXML](scxml) - includes [Core](core) dependency
-```groovy
-compile "com.ToxicBakery.kfinstatemachine:scxml:2.+"
-```
-
-[1]:https://en.wikipedia.org/wiki/Finite-state_machine
-
-## Build
-The library depends on gradle for compilation and requires JDK 8 or higher.
-
-`./gradlew build`
