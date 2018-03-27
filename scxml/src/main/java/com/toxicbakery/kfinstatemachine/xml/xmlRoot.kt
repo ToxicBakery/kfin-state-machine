@@ -5,7 +5,6 @@ import com.toxicbakery.kfinstatemachine.FiniteState
 import com.toxicbakery.kfinstatemachine.StateMachine
 import com.toxicbakery.kfinstatemachine.Transition
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
-import com.toxicbakery.kfinstatemachine.graph.GraphEdge
 import com.toxicbakery.kfinstatemachine.xml.model.XmlRoot
 import com.toxicbakery.kfinstatemachine.xml.model.XmlState
 
@@ -21,20 +20,22 @@ fun XmlRoot.createSimpleMachine() =
 fun <F : FiniteState, T : Transition> XmlRoot.createSimpleMachineWithMapping(
         stateMapper: (id: String) -> F,
         transitionMapper: (event: String) -> T
-): StateMachine<F, T> = states
-        .flatMap { xmlState ->
-            xmlState.transitions.map { xmlTransition ->
-                GraphEdge(
-                        left = stateMapper(xmlState.id),
-                        right = stateMapper(xmlTransition.target),
-                        label = transitionMapper(xmlTransition.event)
-                )
+): StateMachine<F, T> = mutableMapOf<F, MutableMap<T, F>>()
+        .apply {
+            states.forEach { xmlState ->
+                xmlState.transitions
+                        .forEach { xmlTransition ->
+                            val left = stateMapper(xmlState.id)
+                            val right = stateMapper(xmlTransition.target)
+                            val edge = transitionMapper(xmlTransition.event)
+                            getOrPut(left, { mutableMapOf() })[edge] = right
+                        }
             }
         }
-        .toSet()
-        .let { edges: Set<GraphEdge<F, T>> ->
+        .toMap()
+        .let { mappedEdges ->
             BaseMachine(
-                    directedGraph = DirectedGraph(edges),
+                    directedGraph = DirectedGraph(mappedEdges),
                     initialState = stateMapper(initial)
             )
         }
@@ -58,7 +59,7 @@ private fun XmlState.createParallelMachine(
 ) {
     states.forEach { }
     namedMachines[id] = BaseMachine(
-            directedGraph = DirectedGraph<FiniteState, Transition>(setOf()),
+            directedGraph = DirectedGraph<FiniteState, Transition>(mapOf()),
             initialState = FiniteXmlState("")
     )
 }

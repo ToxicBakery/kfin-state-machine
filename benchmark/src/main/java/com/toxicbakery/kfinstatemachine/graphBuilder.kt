@@ -1,20 +1,14 @@
 package com.toxicbakery.kfinstatemachine
 
-import com.toxicbakery.kfinstatemachine.graph.GraphEdge
-
 fun createGraphEdges(
         edgeCount: Int
-): Set<GraphEdge<TestFiniteState, TestTransition>> =
-        mutableSetOf<GraphEdge<TestFiniteState, TestTransition>>()
+): Map<TestFiniteState, Map<TestTransition, TestFiniteState>> =
+        mutableMapOf<TestFiniteState, MutableMap<TestTransition, TestFiniteState>>()
                 .apply {
                     for (i in 1..edgeCount) {
-                        add(
-                                GraphEdge(
-                                        left = TestFiniteState("node_$i"),
-                                        right = TestFiniteState("node_${i + 1}"),
-                                        label = TestTransition("edge_$i")
-                                )
-                        )
+                        val left = TestFiniteState("node_$i")
+                        val right = TestFiniteState("node_${i + 1}")
+                        val label = TestTransition("edge_$i")
+                        getOrPut(left, { mutableMapOf() })[label] = right
                     }
                 }
-                .toSet()

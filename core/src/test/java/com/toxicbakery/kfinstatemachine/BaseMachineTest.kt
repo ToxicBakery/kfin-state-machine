@@ -3,25 +3,17 @@ package com.toxicbakery.kfinstatemachine
 import com.toxicbakery.kfinstatemachine.BaseMachineTest.Energy.*
 import com.toxicbakery.kfinstatemachine.BaseMachineTest.EnergyTransition.*
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
-import com.toxicbakery.kfinstatemachine.graph.GraphEdge
+import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
 import org.junit.Assert.*
 import org.junit.Test
 import java.util.concurrent.Semaphore
 
 class BaseMachineTest {
 
-    private val directedGraph = DirectedGraph(
-            edges = setOf(
-                    GraphEdge(
-                            left = Potential,
-                            right = Kinetic,
-                            label = Release
-                    ),
-                    GraphEdge(
-                            left = Kinetic,
-                            right = Potential,
-                            label = Store
-                    )
+    private val directedGraph: IDirectedGraph<Energy, EnergyTransition> = DirectedGraph(
+            mappedEdges = mapOf(
+                    Potential to mapOf<EnergyTransition, Energy>(Release to Kinetic),
+                    Kinetic to mapOf<EnergyTransition, Energy>(Store to Potential)
             )
     )
 
@@ -140,14 +132,6 @@ class BaseMachineTest {
                 directedGraph = directedGraph,
                 initialState = InvalidState
         )
-    }
-
-    @Test(expected = Exception::class)
-    fun edgesForNode() {
-        BaseMachine(
-                directedGraph = directedGraph,
-                initialState = Potential
-        ).edgesForNode(InvalidState)
     }
 
 }

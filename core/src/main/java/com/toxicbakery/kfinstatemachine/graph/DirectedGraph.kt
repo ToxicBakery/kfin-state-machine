@@ -3,37 +3,25 @@ package com.toxicbakery.kfinstatemachine.graph
 /**
  * Graph implementation built by defining nodes via their associated edges.
  * The graph may contain one or groups of edges.
+ *
+ * @param mappedEdges edges of the graph grouped by their left node pointing to `n` nodes
  */
-data class DirectedGraph<N, out L>(
-        override val edges: Set<GraphEdge<N, L>>
+data class DirectedGraph<N, L>(
+        private val mappedEdges: Map<N, Map<L, N>>
 ) : IDirectedGraph<N, L> {
 
-    override val mappedEdges: Map<N, List<GraphEdge<N, L>>> =
-            edges.groupBy { it.left }
-
     override val nodes: Set<N> =
-            edges.flatMap { setOf(it.left, it.right) }
+            mappedEdges.values
+                    .flatMap(Map<L, N>::values)
+                    .plus(mappedEdges.keys)
                     .toSet()
-
-    init {
-        edges.groupBy { Pair(it.left, it.label) }
-                .map { it.value }
-                .firstOrNull { it.size > 1 }
-                ?.let { offendingEdges: List<GraphEdge<N, L>> ->
-                    val (leftNode, label) = offendingEdges.first()
-                            .let { Pair(it.left, it.label) }
-                    val ambiguousNodes = offendingEdges.map { it.right }
-                    throw Exception("""Ambiguous edges detected for $leftNode with edge $label.
-                    Destination nodes found $ambiguousNodes""")
-                }
-    }
 
     override fun nodeTransitions(node: N): Set<L> =
-            getEdgesForNode(node)
-                    .map { it.label }
-                    .toSet()
+            nodeEdges(node).keys
 
-    private fun getEdgesForNode(node: N): List<GraphEdge<N, L>> =
-            mappedEdges[node] ?: throw Exception("Node not in graph.")
+    override fun nodeEdges(
+            node: N,
+            default: () -> Map<L, N>
+    ): Map<L, N> = mappedEdges[node] ?: default()
 
 }
