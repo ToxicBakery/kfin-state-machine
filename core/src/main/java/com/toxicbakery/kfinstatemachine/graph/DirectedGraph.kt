@@ -1,5 +1,9 @@
 package com.toxicbakery.kfinstatemachine.graph
 
+/**
+ * Graph implementation built by defining nodes via their associated edges.
+ * The graph may contain one or groups of edges.
+ */
 data class DirectedGraph<N, out L>(
         override val edges: Set<GraphEdge<N, L>>
 ) : IDirectedGraph<N, L> {

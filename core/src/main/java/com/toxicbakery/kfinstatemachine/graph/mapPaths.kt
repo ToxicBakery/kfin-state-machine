@@ -1,11 +1,13 @@
 package com.toxicbakery.kfinstatemachine.graph
 
 /**
- * Map acyclic paths from a given starting point.
+ * Map all unique acyclic paths from a given starting point.
+ *
+ * @param start the node to begin the search for unique paths through the graph
  */
 fun <N, E> IDirectedGraph<N, E>.mapAcyclicPaths(
         start: N
-): Set<List<N>> = mapAcyclicPaths(mutableListOf(start))
+): Set<List<N>> = mapAcyclicPaths(currentPath = mutableListOf(start))
 
 /**
  * Recursive search function for finding acyclic paths in a directed graph.
@@ -24,7 +26,9 @@ private fun <N, E> IDirectedGraph<N, E>.mapAcyclicPaths(
                 // Copy the path and start a recursive search
                 currentPath.plus(edge.right)
                         .toMutableList()
-                        .let { mapAcyclicPaths(it, pathSet) }
+                        .let { currentPath ->
+                            mapAcyclicPaths(currentPath = currentPath, pathSet = pathSet)
+                        }
             }
         }
     } else pathSet.add(currentPath)
