@@ -105,6 +105,23 @@ class BaseMachineTest {
     }
 
     @Test
+    fun listenerEvent() {
+        val machine = BaseMachine(
+                directedGraph = directedGraph,
+                initialState = Potential
+        )
+
+        machine.addListener(
+                { transitionEvent ->
+                    assertEquals(TransitionEvent(Release, Kinetic), transitionEvent)
+                    assertEquals(Release, transitionEvent.transition)
+                    assertEquals(Kinetic, transitionEvent.targetState)
+                })
+                .also { machine.performTransition(Release) }
+                .also(machine::removeListener)
+    }
+
+    @Test
     fun availableTransitions() {
         val machine = BaseMachine(
                 directedGraph = directedGraph,

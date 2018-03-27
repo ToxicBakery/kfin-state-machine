@@ -8,7 +8,6 @@ import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.*
 
 class RxMachineTest {
 
@@ -40,15 +39,13 @@ class RxMachineTest {
     @Test
     fun stateObservableTest() {
         val machine = BaseMachine(energyDirectedGraph, Potential)
-        val expectedStates = LinkedList(
-                listOf(
-                        Potential,
-                        Kinetic
-                )
+        val expectedStates = mutableListOf(
+                Potential,
+                Kinetic
         )
 
         val disposable = machine.stateObservable
-                .subscribe { energy: Energy -> assertEquals(expectedStates.poll(), energy) }
+                .subscribe { energy: Energy -> assertEquals(expectedStates.removeAt(0), energy) }
 
         machine.performTransition(Release)
         assertEquals(0, expectedStates.size)
@@ -58,15 +55,13 @@ class RxMachineTest {
     @Test
     fun transitionObservableTest() {
         val machine = BaseMachine(energyDirectedGraph, Potential)
-        val expectedTransitions = LinkedList(
-                listOf(
-                        TransitionEvent(Release, Kinetic),
-                        TransitionEvent(Store, Potential)
-                )
+        val expectedTransitions = mutableListOf(
+                TransitionEvent(Release, Kinetic),
+                TransitionEvent(Store, Potential)
         )
 
         val disposable = machine.transitionObservable
-                .subscribe { transitionEvent -> assertEquals(expectedTransitions.poll(), transitionEvent) }
+                .subscribe { transitionEvent -> assertEquals(expectedTransitions.removeAt(0), transitionEvent) }
 
         machine.performTransition(Release)
         machine.performTransition(Store)
