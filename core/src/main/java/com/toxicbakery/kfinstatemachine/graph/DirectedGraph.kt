@@ -3,8 +3,6 @@ package com.toxicbakery.kfinstatemachine.graph
 /**
  * Graph implementation built by defining nodes via their associated edges.
  * The graph may contain one or groups of edges.
- *
- * @param edges basis of the graph defining the nodes and how they relate to each other
  */
 data class DirectedGraph<N, out L>(
         override val edges: Set<GraphEdge<N, L>>
