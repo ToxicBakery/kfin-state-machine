@@ -14,7 +14,9 @@ open class BaseMachine<F : FiniteState, T : Transition>(
         initialState: F
 ) : StateMachine<F, T> {
 
-    private var node: F = directedGraph.nodes.first { it == initialState }
+    private var node: F = directedGraph.nodes.find { it == initialState }
+            ?: throw Exception("Invalid initial state $initialState not found in graph.")
+
     private val listeners: MutableSet<(transitionEvent: TransitionEvent<F, T>) -> Unit> = hashSetOf()
 
     override val state: F
@@ -67,8 +69,8 @@ open class BaseMachine<F : FiniteState, T : Transition>(
      * @param event the label of the edge
      */
     protected open fun edgeForTransitionName(event: String): GraphEdge<F, T> =
-            directedGraph.mappedEdges[node]
-                    ?.find { edge -> edge.label.event == event }
+            edgesForNode(node)
+                    .find { edge -> edge.label.event == event }
                     ?: throw Exception("Invalid transition $event for current state $node")
 
     /**
@@ -78,5 +80,13 @@ open class BaseMachine<F : FiniteState, T : Transition>(
      */
     protected open fun notifyListeners(transitionEvent: TransitionEvent<F, T>) =
             listeners.forEach { transitionListener -> transitionListener(transitionEvent) }
+
+    /**
+     * Get the edges for a node or throw if the the node does not exist in the graph.
+     *
+     * @param node to find in the graph
+     */
+    internal fun edgesForNode(node: F): List<GraphEdge<F, T>> =
+            directedGraph.mappedEdges[node] ?: throw Exception("Node $node not in graph")
 
 }

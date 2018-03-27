@@ -1,7 +1,6 @@
 package com.toxicbakery.kfinstatemachine
 
-import com.toxicbakery.kfinstatemachine.BaseMachineTest.Energy.Kinetic
-import com.toxicbakery.kfinstatemachine.BaseMachineTest.Energy.Potential
+import com.toxicbakery.kfinstatemachine.BaseMachineTest.Energy.*
 import com.toxicbakery.kfinstatemachine.BaseMachineTest.EnergyTransition.*
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.GraphEdge
@@ -27,14 +26,15 @@ class BaseMachineTest {
     )
 
     sealed class Energy(override val id: String) : FiniteState {
-        object Kinetic : Energy("kinetic")
-        object Potential : Energy("potential")
+        object Kinetic : Energy("Kinetic")
+        object Potential : Energy("Potential")
+        object InvalidState : Energy("InvalidState")
     }
 
     sealed class EnergyTransition(override val event: String) : Transition {
         object Store : EnergyTransition("Store")
         object Release : EnergyTransition("Release")
-        object Invalid : EnergyTransition("Invalid")
+        object InvalidTransition : EnergyTransition("InvalidTransition")
     }
 
     @Test
@@ -84,7 +84,7 @@ class BaseMachineTest {
                 initialState = Potential
         )
 
-        machine.performTransition(Invalid)
+        machine.performTransition(InvalidTransition)
     }
 
     @Test
@@ -132,6 +132,22 @@ class BaseMachineTest {
                 setOf(Release),
                 machine.availableTransitions
         )
+    }
+
+    @Test(expected = Exception::class)
+    fun initialStateOutsideGraph() {
+        BaseMachine(
+                directedGraph = directedGraph,
+                initialState = InvalidState
+        )
+    }
+
+    @Test(expected = Exception::class)
+    fun edgesForNode() {
+        BaseMachine(
+                directedGraph = directedGraph,
+                initialState = Potential
+        ).edgesForNode(InvalidState)
     }
 
 }
