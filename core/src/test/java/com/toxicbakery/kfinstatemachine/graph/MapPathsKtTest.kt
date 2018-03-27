@@ -7,35 +7,20 @@ class MapPathsKtTest {
 
     @Test
     fun mapAllPaths() {
-        val edges = setOf(
-                GraphEdge(
-                        left = "node_1",
-                        right = "node_2",
-                        label = "edge_1"
+        mapOf(
+                "node_1" to mapOf(
+                        "edge_1" to "node_2",
+                        "edge_2" to "node_3"
                 ),
-                GraphEdge(
-                        left = "node_1",
-                        right = "node_3",
-                        label = "edge_2"
+                "node_2" to mapOf(
+                        "edge_3" to "node_3",
+                        "edge_4" to "node_4"
                 ),
-                GraphEdge(
-                        left = "node_2",
-                        right = "node_3",
-                        label = "edge_3"
-                ),
-                GraphEdge(
-                        left = "node_2",
-                        right = "node_4",
-                        label = "edge_4"
-                ),
-                GraphEdge(
-                        left = "node_4",
-                        right = "node_2",
-                        label = "edge_5"
+                "node_4" to mapOf(
+                        "edge_5" to "node_2"
                 ))
-
-        val directedGraph = DirectedGraph(edges)
-        directedGraph.mapAcyclicPaths("node_1")
+                .let { edges -> DirectedGraph(edges) }
+                .mapAcyclicPaths("node_1")
                 .let { foundPaths: Set<List<String>> ->
                     assertEquals(
                             setOf(

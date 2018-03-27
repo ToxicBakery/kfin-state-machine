@@ -16,15 +16,15 @@ private fun <N, E> IDirectedGraph<N, E>.mapAcyclicPaths(
         currentPath: MutableList<N>,
         pathSet: MutableSet<List<N>> = mutableSetOf()
 ): Set<List<N>> {
-    val edges: List<GraphEdge<N, E>> = mappedEdges[currentPath.last()] ?: listOf()
+    val edges: Map<E, N> = nodeEdges(currentPath.last(), { mapOf() })
     if (edges.isNotEmpty()) {
         edges.forEach { edge ->
-            if (currentPath.contains(edge.right)) {
+            if (currentPath.contains(edge.value)) {
                 // Avoid loops and end the path
                 pathSet.add(currentPath)
             } else {
                 // Copy the path and start a recursive search
-                currentPath.plus(edge.right)
+                currentPath.plus(edge.value)
                         .toMutableList()
                         .let { currentPath ->
                             mapAcyclicPaths(currentPath = currentPath, pathSet = pathSet)

@@ -1,7 +1,6 @@
 package com.toxicbakery.kfinstatemachine;
 
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph;
-import com.toxicbakery.kfinstatemachine.graph.GraphEdge;
 import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -12,7 +11,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-import java.util.Set;
+import java.util.Map;
 
 public class BenchmarkSuite {
 
@@ -44,7 +43,9 @@ public class BenchmarkSuite {
 
         @Setup
         public void setup() {
-            Set<GraphEdge<TestFiniteState, TestTransition>> edges = GraphBuilderKt.createGraphEdges(graphEdgeCount);
+            Map<TestFiniteState, Map<TestTransition, TestFiniteState>> edges =
+                    GraphBuilderKt.createGraphEdges(graphEdgeCount);
+
             directedGraph = new DirectedGraph<>(edges);
             lastNode = new TestFiniteState("node_" + (graphEdgeCount + 1));
         }
@@ -66,7 +67,7 @@ public class BenchmarkSuite {
         @Param({"1", "10", "100", "1000"})
         private int graphEdgeCount;
 
-        private Set<GraphEdge<TestFiniteState, TestTransition>> graphEdges;
+        private Map<TestFiniteState, Map<TestTransition, TestFiniteState>> graphEdges;
 
         @Setup
         public void setup() {

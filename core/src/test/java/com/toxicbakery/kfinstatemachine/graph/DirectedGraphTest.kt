@@ -1,64 +1,44 @@
 package com.toxicbakery.kfinstatemachine.graph
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class DirectedGraphTest {
 
     @Test
-    fun rightEdgesForValue() {
-        val edges = setOf(
-                GraphEdge(
-                        left = "node_1",
-                        right = "node_2",
-                        label = "edge_1"
-                ))
+    fun nodes() {
+        mapOf("node_1" to mapOf("edge_1" to "node_2"))
+                .let { edges -> DirectedGraph(edges) }
+                .nodes
+                .also { nodes -> assertEquals(setOf("node_1", "node_2"), nodes) }
+    }
 
-        (DirectedGraph(edges)
-                .mappedEdges["node_1"] ?: listOf())
-                .toSet()
-                .let { it: Set<GraphEdge<String, String>> ->
-                    assertEquals(edges, it)
+    @Test
+    fun nodeTransitions() {
+        mapOf("node_1" to mapOf("edge_1" to "node_2"))
+                .let { edges -> DirectedGraph(edges) }
+                .nodeTransitions("node_1")
+                .also { transitions -> assertEquals(setOf("edge_1"), transitions) }
+    }
+
+    @Test
+    fun nodeEdges() {
+        mapOf("node_1" to mapOf("edge_1" to "node_2"))
+                .let { edges -> DirectedGraph(edges) }
+                .nodeEdges("node_1")
+                .entries
+                .first()
+                .also { entry: Map.Entry<String, String> ->
+                    assertEquals("edge_1", entry.key)
+                    assertEquals("node_2", entry.value)
                 }
     }
 
-    @Test
-    fun ambiguousNodes() {
-        val edges = setOf(
-                GraphEdge(
-                        left = "node_1",
-                        right = "node_2",
-                        label = "edge_1"
-                ),
-                GraphEdge(
-                        left = "node_1",
-                        right = "node_3",
-                        label = "edge_1"
-                ))
-
-        try {
-            DirectedGraph(edges)
-            fail("Expected exception for ambiguous edges.")
-        } catch (e: Exception) {
-            assertTrue(e.message!!.startsWith("Ambiguous edges detected for "))
-        }
-    }
-
-    @Test
+    @Test(expected = Exception::class)
     fun nodeNotInGraph() {
-        val edges = setOf(
-                GraphEdge(
-                        left = "node_1",
-                        right = "node_2",
-                        label = "edge_1"
-                ))
-
-        try {
-            DirectedGraph(edges)
-                    .nodeTransitions("node_3")
-        } catch (e: Exception) {
-            assertTrue(e.message!! == "Node not in graph.")
-        }
+        mapOf("node_1" to mapOf("edge_1" to "node_2"))
+                .let { edges -> DirectedGraph(edges) }
+                .nodeEdges("node_3")
     }
 
 }

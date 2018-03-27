@@ -2,7 +2,6 @@ package com.toxicbakery.sample.dungeon
 
 import com.toxicbakery.kfinstatemachine.BaseMachine
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
-import com.toxicbakery.kfinstatemachine.graph.GraphEdge
 import com.toxicbakery.sample.dungeon.Direction.*
 import com.toxicbakery.sample.dungeon.Direction.Companion.DIRECTIONS
 import java.util.*
@@ -17,26 +16,27 @@ fun mapToDirectedGraph(map: Array<Array<Boolean>>): BaseMachine<Point, Label> {
                     throw Exception("Map must be square!")
             }
 
-    val edges = mutableSetOf<GraphEdge<Point, Label>>()
-    for (y in 0 until map.size)
-        for (x in 0 until map.size)
-            edges.addAll(createEdges(map, Point(x, y)))
-
-    val graph = DirectedGraph(edges)
-    return BaseMachine(
-            directedGraph = graph,
-            initialState = Random()
-                    .nextInt(edges.size)
-                    .let(edges::elementAt)
-                    .left
-    )
+    return mutableMapOf<Point, MutableMap<Label, Point>>()
+            .apply {
+                for (y in 0 until map.size)
+                    for (x in 0 until map.size)
+                        putAll(createEdges(map, Point(x, y)))
+            }
+            .let { edges -> DirectedGraph(edges) }
+            .let { directedGraph ->
+                BaseMachine(
+                        directedGraph = directedGraph,
+                        initialState = Random()
+                                .nextInt(directedGraph.nodes.size)
+                                .let { directedGraph.nodes.elementAt(it) })
+            }
 }
 
 private fun createEdges(
         map: Array<Array<Boolean>>,
         point: Point
-): MutableSet<GraphEdge<Point, Label>> = mutableSetOf<GraphEdge<Point, Label>>()
-        .also { edges ->
+): MutableMap<Point, MutableMap<Label, Point>> = mutableMapOf<Point, MutableMap<Label, Point>>()
+        .apply {
             DIRECTIONS.forEach { direction: Direction ->
                 when (direction) {
                     North -> point.copy(y = wrapPosition(map, point.y - 1))
@@ -45,8 +45,11 @@ private fun createEdges(
                     East -> point.copy(x = wrapPosition(map, point.x + 1))
                 }.also { target ->
                     if (target != invalidPoint
-                            && targetIsValid(map, target))
-                        edges.add(createEdge(point, target, direction))
+                            && targetIsValid(map, target)) {
+
+                        val label = Label(direction.shortId)
+                        getOrPut(point, { mutableMapOf() })[label] = target
+                    }
                 }
             }
         }
@@ -55,17 +58,6 @@ private fun targetIsValid(
         map: Array<Array<Boolean>>,
         point: Point
 ) = map[point.x][point.y]
-
-private fun createEdge(
-        start: Point,
-        destination: Point,
-        direction: Direction
-): GraphEdge<Point, Label> =
-        GraphEdge(
-                left = start,
-                right = destination,
-                label = Label(direction.shortId)
-        )
 
 private fun wrapPosition(map: Array<Array<Boolean>>, y: Int): Int =
         when {

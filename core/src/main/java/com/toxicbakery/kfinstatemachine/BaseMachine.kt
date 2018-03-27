@@ -1,6 +1,5 @@
 package com.toxicbakery.kfinstatemachine
 
-import com.toxicbakery.kfinstatemachine.graph.GraphEdge
 import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
 
 /**
@@ -36,19 +35,19 @@ open class BaseMachine<F : FiniteState, T : Transition>(
 
     override fun performTransitionByName(event: String) {
         edgeForTransitionName(event)
-                .also { edge: GraphEdge<F, T> ->
+                .also { (transition, node) ->
                     moveToNode(
-                            transition = edge.label,
-                            nextNode = edge.right)
+                            transition = transition,
+                            nextNode = node)
                 }
     }
 
     override fun performTransition(transition: T) {
         edgeForTransitionName(transition.event)
-                .also { edge: GraphEdge<F, T> ->
+                .also { (transition, node) ->
                     moveToNode(
-                            transition = edge.label,
-                            nextNode = edge.right)
+                            transition = transition,
+                            nextNode = node)
                 }
     }
 
@@ -68,9 +67,10 @@ open class BaseMachine<F : FiniteState, T : Transition>(
      *
      * @param event the label of the edge
      */
-    protected open fun edgeForTransitionName(event: String): GraphEdge<F, T> =
-            edgesForNode(node)
-                    .find { edge -> edge.label.event == event }
+    protected open fun edgeForTransitionName(event: String): Map.Entry<T, F> =
+            directedGraph.nodeEdges(node)
+                    .entries
+                    .find { entry -> entry.key.event == event }
                     ?: throw Exception("Invalid transition $event for current state $node")
 
     /**
@@ -80,13 +80,5 @@ open class BaseMachine<F : FiniteState, T : Transition>(
      */
     protected open fun notifyListeners(transitionEvent: TransitionEvent<F, T>) =
             listeners.forEach { transitionListener -> transitionListener(transitionEvent) }
-
-    /**
-     * Get the edges for a node or throw if the the node does not exist in the graph.
-     *
-     * @param node to find in the graph
-     */
-    internal fun edgesForNode(node: F): List<GraphEdge<F, T>> =
-            directedGraph.mappedEdges[node] ?: throw Exception("Node $node not in graph")
 
 }

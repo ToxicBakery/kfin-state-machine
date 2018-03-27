@@ -18,18 +18,10 @@ sealed class EnergyTransition(override val event: String) : Transition {
 
 val machine = BaseMachine(
     directedGraph = DirectedGraph(
-            edges = setOf(
-                    GraphEdge(
-                            left = Potential,
-                            right = Kinetic,
-                            label = Release
-                    ),
-                    GraphEdge(
-                            left = Kinetic,
-                            right = Potential,
-                            label = Store
-                    )
-            )
+        mappedEdges = mapOf(
+            Potential to mapOf<EnergyTransition, Energy>(Release to Kinetic),
+            Kinetic to mapOf<EnergyTransition, Energy>(Store to Potential)
+        )
     ),
     initialState = Potential
 )
@@ -40,12 +32,8 @@ machine.state
 // Move the machine to `Kinetic`
 machine.performTransition(Release)
 
-// Listen for transitions
-machine.addListener(object : TransitionListener<Energy, EnergyTransition> {
-    override fun onTransition(transition: EnergyTransition, target: Energy) {
-        // Perform work before the machine enters the new state
-    }
-})
+// Listen for transition events
+machine.addListener({ transitionEvent -> })
 ```
 
 ## Samples
