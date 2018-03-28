@@ -4,4 +4,5 @@ include ':rx'
 include ':benchmark'
 
 // Samples
+include ':samples:countdown'
 include ':samples:dungeon'
