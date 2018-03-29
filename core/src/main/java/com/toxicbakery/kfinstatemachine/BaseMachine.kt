@@ -16,7 +16,9 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     private var node: F = directedGraph.nodes.find { it == initialState }
             ?: throw Exception("Invalid initial state $initialState not found in graph.")
 
-    private val listeners: MutableSet<(transitionEvent: TransitionEvent<F, T>) -> Unit> = hashSetOf()
+    private val onTransitionListeners: MutableSet<(transitionEvent: TransitionEvent<F, T>) -> Unit> = linkedSetOf()
+
+    private val onStateChangeListeners: MutableSet<(state: F) -> Unit> = linkedSetOf()
 
     override val state: F
         get() = node
@@ -24,13 +26,20 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     override val availableTransitions: Set<T>
         get() = directedGraph.nodeTransitions(node)
 
-    override fun addListener(
+    override fun addOnStateChangeListener(listener: (state: F) -> Unit): (state: F) -> Unit =
+            listener.apply { onStateChangeListeners.add(this) }
+
+    override fun addOnTransitionListener(
             listener: (transitionEvent: TransitionEvent<F, T>) -> Unit
     ): (transitionEvent: TransitionEvent<F, T>) -> Unit =
-            listener.apply { listeners.add(this) }
+            listener.apply { onTransitionListeners.add(this) }
 
-    override fun removeListener(listener: (transitionEvent: TransitionEvent<F, T>) -> Unit) {
-        listeners.remove(listener)
+    override fun removeOnStateChangedListener(listener: (state: F) -> Unit) {
+        onStateChangeListeners.remove(listener)
+    }
+
+    override fun removeOnTransitionListener(listener: (transitionEvent: TransitionEvent<F, T>) -> Unit) {
+        onTransitionListeners.remove(listener)
     }
 
     override fun performTransitionByName(event: String) {
@@ -44,7 +53,7 @@ open class BaseMachine<F : FiniteState, T : Transition>(
 
     override fun performTransition(transition: T) {
         edgeForTransitionName(transition.event)
-                .also { (transition, node) ->
+                .also { (_, node) ->
                     moveToNode(
                             transition = transition,
                             nextNode = node)
@@ -52,14 +61,19 @@ open class BaseMachine<F : FiniteState, T : Transition>(
     }
 
     /**
-     * Transitions the machine from the current state to a new state and notifies listeners of the event.
+     * Transitions the machine from the current state to a new state and notifies onTransitionListeners of the event.
      *
      * @param transition the transition that triggered the state change
-     * @param nextNode the state the machine will move to once all listeners have been notified
+     * @param nextNode the state the machine will move to once all onTransitionListeners have been notified
      */
     protected open fun moveToNode(transition: T, nextNode: F) {
-        notifyListeners(TransitionEvent(transition, nextNode))
+        TransitionEvent(transition, nextNode)
+                .also { transitionEvent ->
+                    onTransitionListeners.forEach { transitionListener -> transitionListener(transitionEvent) }
+                }
+
         node = nextNode
+        onStateChangeListeners.forEach { stateListener -> stateListener(nextNode) }
     }
 
     /**
@@ -72,13 +86,5 @@ open class BaseMachine<F : FiniteState, T : Transition>(
                     .entries
                     .find { entry -> entry.key.event == event }
                     ?: throw Exception("Invalid transition $event for current state $node")
-
-    /**
-     * Notify listeners of a transition.
-     *
-     * @param transitionEvent event describing the pending state change
-     */
-    protected open fun notifyListeners(transitionEvent: TransitionEvent<F, T>) =
-            listeners.forEach { transitionListener -> transitionListener(transitionEvent) }
 
 }

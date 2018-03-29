@@ -80,37 +80,52 @@ class BaseMachineTest {
     }
 
     @Test
-    fun listeners() {
+    fun onTransitionListener() {
         val machine = BaseMachine(
                 directedGraph = directedGraph,
                 initialState = Potential
         )
 
         val semaphore = Semaphore(0)
-        val listener = machine.addListener({ _ -> semaphore.release() })
+        val listener = machine.addOnTransitionListener { _ -> semaphore.release() }
         machine.performTransition(Release)
         assertTrue(semaphore.tryAcquire())
 
-        machine.removeListener(listener)
-        machine.performTransition(Store)
+        machine.removeOnTransitionListener(listener)
         assertFalse(semaphore.tryAcquire())
     }
 
     @Test
-    fun listenerEvent() {
+    fun onStateChangeListener() {
         val machine = BaseMachine(
                 directedGraph = directedGraph,
                 initialState = Potential
         )
 
-        machine.addListener(
+        val semaphore = Semaphore(0)
+        val listener = machine.addOnStateChangeListener { _ -> semaphore.release() }
+        machine.performTransition(Release)
+        assertTrue(semaphore.tryAcquire())
+
+        machine.removeOnStateChangedListener(listener)
+        assertFalse(semaphore.tryAcquire())
+    }
+
+    @Test
+    fun transitionEvent() {
+        val machine = BaseMachine(
+                directedGraph = directedGraph,
+                initialState = Potential
+        )
+
+        machine.addOnTransitionListener(
                 { transitionEvent ->
                     assertEquals(TransitionEvent(Release, Kinetic), transitionEvent)
                     assertEquals(Release, transitionEvent.transition)
                     assertEquals(Kinetic, transitionEvent.targetState)
                 })
                 .also { machine.performTransition(Release) }
-                .also(machine::removeListener)
+                .also(machine::removeOnTransitionListener)
     }
 
     @Test

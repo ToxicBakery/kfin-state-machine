@@ -30,6 +30,6 @@ fun <F : FiniteState, T : Transition, O> StateMachine<F, T>.createObservableTran
         callback: (transitionEvent: TransitionEvent<F, T>) -> O
 ): Observable<O> = Observable.create { emitter ->
     init.subscribe(emitter::onNext)
-    addListener({ transitionEvent -> emitter.onNext(callback(transitionEvent)) })
-            .also { listener -> emitter.setCancellable { removeListener(listener) } }
+    addOnTransitionListener({ transitionEvent -> emitter.onNext(callback(transitionEvent)) })
+            .also { listener -> emitter.setCancellable { removeOnTransitionListener(listener) } }
 }

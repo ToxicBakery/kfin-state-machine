@@ -9,6 +9,7 @@ import com.toxicbakery.sample.countdown.CountdownMachine.TimerEvent.*
 import com.toxicbakery.sample.countdown.CountdownMachine.TimerState
 import com.toxicbakery.sample.countdown.CountdownMachine.TimerState.Running
 import com.toxicbakery.sample.countdown.CountdownMachine.TimerState.Stopped
+import java.util.*
 
 class CountdownMachine : BaseMachine<TimerState, TimerEvent>(
         directedGraph = DirectedGraph(
@@ -24,6 +25,35 @@ class CountdownMachine : BaseMachine<TimerState, TimerEvent>(
         ),
         initialState = Stopped
 ) {
+
+    private lateinit var timer: Timer
+
+    private val timerTask: TimerTask
+        get() = object : TimerTask() {
+            override fun run() {
+                performTransition(Tick)
+            }
+        }
+
+    init {
+        addOnTransitionListener { (transition, targetState) ->
+            println("Machine transitioning for ${transition.event} to ${targetState.id}")
+            when (transition) {
+                Start -> {
+                    println("Creating timer")
+                    timer = Timer()
+                    timer.scheduleAtFixedRate(timerTask, 0, 1000)
+                }
+                Stop -> {
+                    println("Stopping timer")
+                    timer.cancel()
+                }
+            }
+        }
+        addOnStateChangeListener { timerState ->
+            println("Machine moved to ${timerState.id}")
+        }
+    }
 
     sealed class TimerState : FiniteState {
 
