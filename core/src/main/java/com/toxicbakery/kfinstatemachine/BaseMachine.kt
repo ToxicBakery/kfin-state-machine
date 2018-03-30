@@ -9,7 +9,7 @@ import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
  * @param initialState the entry point of the machine used for determining location in the graph
  */
 open class BaseMachine<F : FiniteState, T : Transition>(
-        private val directedGraph: IDirectedGraph<F, T>,
+        val directedGraph: IDirectedGraph<F, T>,
         initialState: F
 ) : StateMachine<F, T> {
 
@@ -60,6 +60,13 @@ open class BaseMachine<F : FiniteState, T : Transition>(
                 }
     }
 
+    override fun transitionForTargetState(targetState: F): T =
+            directedGraph.nodeEdges(node)
+                    .entries
+                    .find { (_, entryState) -> targetState == entryState }
+                    ?.let { (entryTransition, _) -> entryTransition }
+                    ?: throw Exception("Target state ${targetState.id} not valid for current state ${state.id}")
+
     /**
      * Transitions the machine from the current state to a new state and notifies onTransitionListeners of the event.
      *
@@ -85,6 +92,6 @@ open class BaseMachine<F : FiniteState, T : Transition>(
             directedGraph.nodeEdges(node)
                     .entries
                     .find { entry -> entry.key.event == event }
-                    ?: throw Exception("Invalid transition $event for current state $node")
+                    ?: throw Exception("Invalid transition $event for current state ${node.id}")
 
 }

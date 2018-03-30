@@ -16,9 +16,7 @@ class Application(
 ) {
 
     private val machine: StateMachine<Point, Label> =
-            MapGenerator(dimensions = MAP_SIZE)
-                    .generateMap()
-                    .let(::mapToDirectedGraph)
+            MapMachine.createNewMachine(mapSize = MAP_SIZE)
 
     private val availableDirections: List<String>
         get() = machine.availableTransitions

@@ -36,7 +36,7 @@ class RxMachineTest {
                 Kinetic
         )
 
-        val disposable = machine.stateObservable
+        val disposable = machine.stateChangeObservable
                 .subscribe { energy: Energy -> assertEquals(expectedStates.removeAt(0), energy) }
 
         machine.performTransition(Release)
@@ -52,7 +52,7 @@ class RxMachineTest {
                 TransitionEvent(Store, Potential)
         )
 
-        val disposable = machine.transitionObservable
+        val disposable = machine.transitionEventObservable
                 .subscribe { transitionEvent -> assertEquals(expectedTransitions.removeAt(0), transitionEvent) }
 
         machine.performTransition(Release)

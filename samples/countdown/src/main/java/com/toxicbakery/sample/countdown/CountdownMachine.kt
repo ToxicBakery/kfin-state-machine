@@ -9,7 +9,10 @@ import com.toxicbakery.sample.countdown.CountdownMachine.TimerEvent.*
 import com.toxicbakery.sample.countdown.CountdownMachine.TimerState
 import com.toxicbakery.sample.countdown.CountdownMachine.TimerState.Running
 import com.toxicbakery.sample.countdown.CountdownMachine.TimerState.Stopped
-import java.util.*
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
 
 class CountdownMachine : BaseMachine<TimerState, TimerEvent>(
         directedGraph = DirectedGraph(
@@ -26,14 +29,11 @@ class CountdownMachine : BaseMachine<TimerState, TimerEvent>(
         initialState = Stopped
 ) {
 
-    private lateinit var timer: Timer
+    private val subscriptions = CompositeDisposable()
 
-    private val timerTask: TimerTask
-        get() = object : TimerTask() {
-            override fun run() {
-                performTransition(Tick)
-            }
-        }
+    private val timerDisposable: Disposable
+        get() = Observable.interval(1, TimeUnit.SECONDS)
+                .subscribe { performTransition(Tick) }
 
     init {
         addOnTransitionListener { (transition, targetState) ->
@@ -41,12 +41,11 @@ class CountdownMachine : BaseMachine<TimerState, TimerEvent>(
             when (transition) {
                 Start -> {
                     println("Creating timer")
-                    timer = Timer()
-                    timer.scheduleAtFixedRate(timerTask, 0, 1000)
+                    subscriptions.add(timerDisposable)
                 }
                 Stop -> {
                     println("Stopping timer")
-                    timer.cancel()
+                    subscriptions.clear()
                 }
             }
         }

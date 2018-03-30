@@ -63,7 +63,7 @@ class BaseMachineTest {
             fail("Expected exception caused by invalid name.")
         } catch (e: Exception) {
             assertEquals(
-                    "Invalid transition Invalid for current state $Potential",
+                    "Invalid transition Invalid for current state ${Potential.id}",
                     e.message
             )
         }

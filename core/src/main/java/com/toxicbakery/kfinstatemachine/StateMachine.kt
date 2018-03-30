@@ -49,4 +49,9 @@ interface StateMachine<F : FiniteState, T : Transition> {
      */
     fun performTransition(transition: T)
 
+    /**
+     * Get the transition required to move to a given state.
+     */
+    fun transitionForTargetState(targetState: F): T
+
 }

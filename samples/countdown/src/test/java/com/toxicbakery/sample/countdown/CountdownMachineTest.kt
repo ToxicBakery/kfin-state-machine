@@ -1,5 +1,6 @@
 package com.toxicbakery.sample.countdown
 
+import com.toxicbakery.kfinstatemachine.graph.mapAcyclicPaths
 import com.toxicbakery.sample.countdown.CountdownMachine.TimerEvent
 import com.toxicbakery.sample.countdown.CountdownMachine.TimerState
 import org.junit.Test
@@ -21,6 +22,23 @@ class CountdownMachineTest {
 
     @Test
     fun cycle() {
+        val countdownMachine = CountdownMachine()
+        countdownMachine.directedGraph
+                .mapAcyclicPaths(TimerState.Stopped)
+                //.map { states -> states.plus(TimerState.Stopped) }
+                .flatMap { states ->
+                    println("Testing chain: ${states.joinToString { it.id }}")
+                    states.subList(1, states.size)
+
+                }
+                .forEach { targetState ->
+                    countdownMachine.transitionForTargetState(targetState)
+                            .also(countdownMachine::performTransition)
+                }
+    }
+
+    @Test
+    fun emulateApplication() {
         val semaphore = Semaphore(0)
         val countdownMachine = CountdownMachine()
                 .apply {
@@ -30,7 +48,7 @@ class CountdownMachineTest {
                     }
                 }
 
-        // Use the machine
+        // Use the machine as an application might
         oneSecondFromNow.also { targetInstant ->
             val stateListener = countdownMachine.addOnStateChangeListener { timerState ->
                 when (timerState) {
