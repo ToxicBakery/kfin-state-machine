@@ -1,7 +1,7 @@
 package com.toxicbakery.kfinstatemachine
 
-import com.toxicbakery.kfinstatemachine.BaseMachineTest.Energy.*
-import com.toxicbakery.kfinstatemachine.BaseMachineTest.EnergyTransition.*
+import com.toxicbakery.kfinstatemachine.Energy.*
+import com.toxicbakery.kfinstatemachine.EnergyTransition.*
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
 import org.junit.Assert.*
@@ -16,18 +16,6 @@ class BaseMachineTest {
                     Kinetic to mapOf<EnergyTransition, Energy>(Store to Potential)
             )
     )
-
-    sealed class Energy(override val id: String) : FiniteState {
-        object Kinetic : Energy("Kinetic")
-        object Potential : Energy("Potential")
-        object InvalidState : Energy("InvalidState")
-    }
-
-    sealed class EnergyTransition(override val event: String) : Transition {
-        object Store : EnergyTransition("Store")
-        object Release : EnergyTransition("Release")
-        object InvalidTransition : EnergyTransition("InvalidTransition")
-    }
 
     @Test
     fun performTransition() {

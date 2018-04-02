@@ -7,31 +7,31 @@ package com.toxicbakery.kfinstatemachine.graph
  */
 fun <N, E> IDirectedGraph<N, E>.mapAcyclicPaths(
         start: N
-): Set<List<N>> = mapAcyclicPaths(currentPath = mutableListOf(start))
-
-/**
- * Recursive search function for finding acyclic paths in a directed graph.
- */
-private fun <N, E> IDirectedGraph<N, E>.mapAcyclicPaths(
-        currentPath: MutableList<N>,
-        pathSet: MutableSet<List<N>> = mutableSetOf()
 ): Set<List<N>> {
-    val edges: Map<E, N> = nodeEdges(currentPath.last(), { mapOf() })
-    if (edges.isNotEmpty()) {
-        edges.forEach { edge ->
-            if (currentPath.contains(edge.value)) {
-                // Avoid loops and end the path
-                pathSet.add(currentPath)
-            } else {
-                // Copy the path and start a recursive search
-                currentPath.plus(edge.value)
-                        .toMutableList()
-                        .let { currentPath ->
-                            mapAcyclicPaths(currentPath = currentPath, pathSet = pathSet)
+    fun <N, E> IDirectedGraph<N, E>.mapAcyclicPaths(
+            currentPath: MutableList<N>,
+            pathSet: MutableSet<List<N>> = mutableSetOf()
+    ): Set<List<N>> {
+        return nodeEdges(currentPath.last(), { mapOf() })
+                .also { edges ->
+                    if (edges.isNotEmpty()) {
+                        edges.forEach { edge ->
+                            if (currentPath.contains(edge.value)) {
+                                // Avoid loops and end the path
+                                pathSet.add(currentPath)
+                            } else {
+                                // Copy the path and start a recursive search
+                                currentPath.plus(edge.value)
+                                        .toMutableList()
+                                        .let { currentPath ->
+                                            mapAcyclicPaths(currentPath = currentPath, pathSet = pathSet)
+                                        }
+                            }
                         }
-            }
-        }
-    } else pathSet.add(currentPath)
+                    } else pathSet.add(currentPath)
+                }
+                .let { pathSet }
+    }
 
-    return pathSet
+    return mapAcyclicPaths(mutableListOf(start))
 }
