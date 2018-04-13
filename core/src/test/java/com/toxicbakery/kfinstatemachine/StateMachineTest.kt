@@ -8,7 +8,7 @@ import org.junit.Assert.*
 import org.junit.Test
 import java.util.concurrent.Semaphore
 
-class BaseMachineTest {
+class StateMachineTest {
 
     private val directedGraph: IDirectedGraph<Energy, EnergyTransition> = DirectedGraph(
             mappedEdges = mapOf(
@@ -19,8 +19,13 @@ class BaseMachineTest {
 
     @Test
     fun performTransition() {
-        val machine = BaseMachine(
-                directedGraph = directedGraph,
+        val machine = StateMachine(
+                directedGraph = DirectedGraph(
+                        mapOf(
+                                Potential to mapOf<EnergyTransition, Energy>(Release to Kinetic),
+                                Kinetic to mapOf<EnergyTransition, Energy>(Store to Potential)
+                        )
+                ),
                 initialState = Potential
         )
 
@@ -30,7 +35,7 @@ class BaseMachineTest {
 
     @Test
     fun performTransitionByName() {
-        val machine = BaseMachine(
+        val machine = StateMachine(
                 directedGraph = directedGraph,
                 initialState = Potential
         )
@@ -41,7 +46,7 @@ class BaseMachineTest {
 
     @Test
     fun performTransitionByNameWithInvalidName() {
-        val machine = BaseMachine(
+        val machine = StateMachine(
                 directedGraph = directedGraph,
                 initialState = Potential
         )
@@ -59,7 +64,7 @@ class BaseMachineTest {
 
     @Test(expected = Exception::class)
     fun findNextNode() {
-        val machine = BaseMachine(
+        val machine = StateMachine(
                 directedGraph = directedGraph,
                 initialState = Potential
         )
@@ -69,7 +74,7 @@ class BaseMachineTest {
 
     @Test
     fun onTransitionListener() {
-        val machine = BaseMachine(
+        val machine = StateMachine(
                 directedGraph = directedGraph,
                 initialState = Potential
         )
@@ -85,7 +90,7 @@ class BaseMachineTest {
 
     @Test
     fun onStateChangeListener() {
-        val machine = BaseMachine(
+        val machine = StateMachine(
                 directedGraph = directedGraph,
                 initialState = Potential
         )
@@ -101,7 +106,7 @@ class BaseMachineTest {
 
     @Test
     fun transitionEvent() {
-        val machine = BaseMachine(
+        val machine = StateMachine(
                 directedGraph = directedGraph,
                 initialState = Potential
         )
@@ -118,7 +123,7 @@ class BaseMachineTest {
 
     @Test
     fun availableTransitions() {
-        val machine = BaseMachine(
+        val machine = StateMachine(
                 directedGraph = directedGraph,
                 initialState = Potential
         )
@@ -131,7 +136,7 @@ class BaseMachineTest {
 
     @Test(expected = Exception::class)
     fun initialStateOutsideGraph() {
-        BaseMachine(
+        StateMachine(
                 directedGraph = directedGraph,
                 initialState = InvalidState
         )

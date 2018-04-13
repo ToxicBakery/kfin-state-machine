@@ -1,6 +1,6 @@
 package com.toxicbakery.sample.countdown
 
-import com.toxicbakery.kfinstatemachine.BaseMachine
+import com.toxicbakery.kfinstatemachine.StateMachine
 import com.toxicbakery.kfinstatemachine.FiniteState
 import com.toxicbakery.kfinstatemachine.Transition
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
@@ -14,7 +14,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
 
-class CountdownMachine : BaseMachine<TimerState, TimerEvent>(
+class CountdownMachine : StateMachine<TimerState, TimerEvent>(
         directedGraph = DirectedGraph(
                 mappedEdges = mapOf(
                         Stopped to mapOf<TimerEvent, TimerState>(

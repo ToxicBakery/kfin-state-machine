@@ -1,13 +1,13 @@
 package com.toxicbakery.sample.dungeon
 
-import com.toxicbakery.kfinstatemachine.BaseMachine
+import com.toxicbakery.kfinstatemachine.StateMachine
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import java.util.*
 
 class MapMachine private constructor(
         directedGraph: DirectedGraph<Point, Label>,
         initialState: Point
-) : BaseMachine<Point, Label>(
+) : StateMachine<Point, Label>(
         directedGraph,
         initialState
 ) {

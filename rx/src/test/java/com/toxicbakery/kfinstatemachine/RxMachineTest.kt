@@ -30,7 +30,7 @@ class RxMachineTest {
 
     @Test
     fun stateObservableTest() {
-        val machine = BaseMachine(energyDirectedGraph, Potential)
+        val machine = StateMachine(energyDirectedGraph, Potential)
         val expectedStates = mutableListOf(
                 Potential,
                 Kinetic
@@ -46,7 +46,7 @@ class RxMachineTest {
 
     @Test
     fun transitionObservableTest() {
-        val machine = BaseMachine(energyDirectedGraph, Potential)
+        val machine = StateMachine(energyDirectedGraph, Potential)
         val expectedTransitions = mutableListOf(
                 TransitionEvent(Release, Kinetic),
                 TransitionEvent(Store, Potential)

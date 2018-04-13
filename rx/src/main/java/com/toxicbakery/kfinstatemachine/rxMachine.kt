@@ -5,7 +5,7 @@ import io.reactivex.Observable
 /**
  * Streams the current state of the machine and future state changes.
  */
-val <F : FiniteState, T : Transition> StateMachine<F, T>.stateChangeObservable: Observable<F>
+val <F : FiniteState, T : Transition> IStateMachine<F, T>.stateChangeObservable: Observable<F>
     get() = Observable.create { emitter ->
         emitter.onNext(state)
         addOnStateChangeListener(emitter::onNext)
@@ -15,7 +15,7 @@ val <F : FiniteState, T : Transition> StateMachine<F, T>.stateChangeObservable: 
 /**
  * Streams machine transition events.
  */
-val <F : FiniteState, T : Transition> StateMachine<F, T>.transitionEventObservable: Observable<TransitionEvent<F, T>>
+val <F : FiniteState, T : Transition> IStateMachine<F, T>.transitionEventObservable: Observable<TransitionEvent<F, T>>
     get() = Observable.create { emitter ->
         addOnTransitionListener(emitter::onNext)
                 .also { listener -> emitter.setCancellable { removeOnTransitionListener(listener) } }
