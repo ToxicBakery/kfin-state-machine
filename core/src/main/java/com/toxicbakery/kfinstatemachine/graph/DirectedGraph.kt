@@ -23,8 +23,8 @@ open class DirectedGraph<N, L>(
 
     override fun nodeEdges(
             node: N,
-            default: () -> Map<L, N>
-    ): Map<L, N> = mappedEdges[node] ?: default()
+            defaultValue: () -> Map<L, N>
+    ): Map<L, N> = mappedEdges[node] ?: defaultValue()
 
 }
 

@@ -8,6 +8,7 @@ import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlin.reflect.KClass
 
 class RxMachineTest {
 
@@ -16,15 +17,15 @@ class RxMachineTest {
         object Potential : Energy("potential")
     }
 
-    sealed class EnergyTransition(override val event: String) : Transition {
-        object Store : EnergyTransition("Store")
-        object Release : EnergyTransition("Release")
+    sealed class EnergyTransition {
+        object Store : EnergyTransition()
+        object Release : EnergyTransition()
     }
 
-    private val energyDirectedGraph: IDirectedGraph<Energy, EnergyTransition> = DirectedGraph(
+    private val energyDirectedGraph: IDirectedGraph<Energy, KClass<*>> = DirectedGraph(
             mappedEdges = mapOf(
-                    Potential to mapOf<EnergyTransition, Energy>(Release to Kinetic),
-                    Kinetic to mapOf<EnergyTransition, Energy>(Store to Potential)
+                    Potential to mapOf<KClass<*>, Energy>(Release::class to Kinetic),
+                    Kinetic to mapOf<KClass<*>, Energy>(Store::class to Potential)
             )
     )
 

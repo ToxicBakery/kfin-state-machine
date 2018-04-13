@@ -7,14 +7,14 @@ import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
 import org.junit.Assert.*
 import org.junit.Test
 import java.util.concurrent.Semaphore
+import kotlin.reflect.KClass
 
 class StateMachineTest {
 
-    private val directedGraph: IDirectedGraph<Energy, EnergyTransition> = DirectedGraph(
+    private val directedGraph: IDirectedGraph<Energy, KClass<*>> = DirectedGraph(
             mappedEdges = mapOf(
-                    Potential to mapOf<EnergyTransition, Energy>(Release to Kinetic),
-                    Kinetic to mapOf<EnergyTransition, Energy>(Store to Potential)
-            )
+                    Potential to mapOf<KClass<*>, Energy>(Release::class to Kinetic),
+                    Kinetic to mapOf<KClass<*>, Energy>(Store::class to Potential))
     )
 
     @Test
@@ -22,52 +22,21 @@ class StateMachineTest {
         val machine = StateMachine(
                 directedGraph = DirectedGraph(
                         mapOf(
-                                Potential to mapOf<EnergyTransition, Energy>(Release to Kinetic),
-                                Kinetic to mapOf<EnergyTransition, Energy>(Store to Potential)
+                                Potential to mapOf<KClass<*>, Energy>(Release::class to Kinetic),
+                                Kinetic to mapOf<KClass<*>, Energy>(Store::class to Potential)
                         )
                 ),
-                initialState = Potential
-        )
+                initialState = Potential)
 
         machine.performTransition(Release)
         assertEquals(Kinetic, machine.state)
-    }
-
-    @Test
-    fun performTransitionByName() {
-        val machine = StateMachine(
-                directedGraph = directedGraph,
-                initialState = Potential
-        )
-
-        machine.performTransitionByName("Release")
-        assertEquals(Kinetic, machine.state)
-    }
-
-    @Test
-    fun performTransitionByNameWithInvalidName() {
-        val machine = StateMachine(
-                directedGraph = directedGraph,
-                initialState = Potential
-        )
-
-        try {
-            machine.performTransitionByName("Invalid")
-            fail("Expected exception caused by invalid name.")
-        } catch (e: Exception) {
-            assertEquals(
-                    "Invalid transition Invalid for current state ${Potential.id}",
-                    e.message
-            )
-        }
     }
 
     @Test(expected = Exception::class)
     fun findNextNode() {
         val machine = StateMachine(
                 directedGraph = directedGraph,
-                initialState = Potential
-        )
+                initialState = Potential)
 
         machine.performTransition(InvalidTransition)
     }
@@ -76,8 +45,7 @@ class StateMachineTest {
     fun onTransitionListener() {
         val machine = StateMachine(
                 directedGraph = directedGraph,
-                initialState = Potential
-        )
+                initialState = Potential)
 
         val semaphore = Semaphore(0)
         val listener = machine.addOnTransitionListener { _ -> semaphore.release() }
@@ -92,8 +60,7 @@ class StateMachineTest {
     fun onStateChangeListener() {
         val machine = StateMachine(
                 directedGraph = directedGraph,
-                initialState = Potential
-        )
+                initialState = Potential)
 
         val semaphore = Semaphore(0)
         val listener = machine.addOnStateChangeListener { _ -> semaphore.release() }
@@ -108,8 +75,7 @@ class StateMachineTest {
     fun transitionEvent() {
         val machine = StateMachine(
                 directedGraph = directedGraph,
-                initialState = Potential
-        )
+                initialState = Potential)
 
         machine.addOnTransitionListener(
                 { transitionEvent ->
@@ -125,21 +91,28 @@ class StateMachineTest {
     fun availableTransitions() {
         val machine = StateMachine(
                 directedGraph = directedGraph,
-                initialState = Potential
-        )
+                initialState = Potential)
 
         assertEquals(
-                setOf(Release),
-                machine.availableTransitions
-        )
+                setOf(Release::class),
+                machine.availableTransitions)
     }
 
     @Test(expected = Exception::class)
     fun initialStateOutsideGraph() {
         StateMachine(
                 directedGraph = directedGraph,
-                initialState = InvalidState
-        )
+                initialState = InvalidState)
+    }
+
+    @Test
+    fun transitionsForTargetState() {
+        val machine = StateMachine(
+                directedGraph = directedGraph,
+                initialState = Potential)
+
+        assertEquals(setOf<KClass<*>>(), machine.transitionsForTargetState(Potential))
+        assertEquals(setOf<KClass<*>>(Release::class), machine.transitionsForTargetState(Kinetic))
     }
 
 }
