@@ -4,5 +4,6 @@ include ':core'
 //include ':benchmark'
 
 // Samples
+//include ':samples:android'
 //include ':samples:countdown'
 //include ':samples:dungeon'
