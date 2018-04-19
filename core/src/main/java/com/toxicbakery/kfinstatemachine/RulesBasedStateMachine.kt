@@ -14,28 +14,26 @@ open class RulesBasedStateMachine<F : FiniteState>(
                 .filter { transitionRule -> transitionRule.oldState == _state }
                 .toSet()
 
-    private val edgeNames: Set<String>
+    @Suppress("UNCHECKED_CAST")
+    private val edgeNames: Set<Class<F>>
         get() = edges
-                .map { it.transition.java.simpleName }
+                .map { it.transition.java as Class<F> }
                 .toSet()
 
     override val state: F
         get() = _state
 
-    override val availableTransitions: Set<KClass<*>>
+    override val transitions: Set<KClass<*>>
         get() = transitionRules.filter { it.oldState == _state }
                 .map { it.transition }
                 .toSet()
 
-    override fun performTransition(transition: Any) {
-        _state = edges
-                .filter { it.transition.java.isInstance(transition) }
-                .singleOrNull { it.transition(this, transition) }
-                ?.newState
-                ?: throw Exception("Invalid transition `$transition` for state `$_state`.\nValid edges: $edgeNames")
-    }
+    override fun transition(transition: Any): Unit =
+            edge(transition)
+                    .also { _state = it.newState }
+                    .performAction(transition)
 
-    override fun transitionsForTargetState(targetState: F): Set<KClass<*>> =
+    override fun transitionsTo(targetState: F): Set<KClass<*>> =
             transitionRules
                     .filter {
                         it.oldState == _state
@@ -43,6 +41,12 @@ open class RulesBasedStateMachine<F : FiniteState>(
                     }
                     .map { it.transition }
                     .toSet()
+
+    @Suppress("UNCHECKED_CAST")
+    private fun edge(transition: Any) = edges
+            .filter { it.transition.java.isInstance(transition) && it.validate(transition) }
+            .singleOrNull()
+            ?: throw Exception("Invalid transition `${transition.javaClass.simpleName}` for state `$_state`.\nValid edges: $edgeNames")
 
     companion object {
         fun <F, T : Any> transition(oldState: F, transition: KClass<T>, newState: F): TransitionRule<F, T> =
@@ -58,19 +62,18 @@ data class TransitionRule<S, T : Any>(
         val oldState: S,
         val transition: KClass<T>,
         val newState: S,
-        private val onlyIf: (transition: T) -> Boolean = { true },
-        private val doAction: (transitionable: ITransitionable<S>, transition: T) -> Unit = { _, _ -> }
+        private val _onlyIf: (transition: T) -> Boolean = { _ -> true },
+        private val _reaction: (transition: T) -> Unit = { _ -> }
 ) {
 
-    fun onlyIf(func: (transition: T) -> Boolean): TransitionRule<S, T> = copy(onlyIf = func)
+    fun onlyIf(func: (transition: T) -> Boolean): TransitionRule<S, T> = copy(_onlyIf = func)
 
-    fun doAction(func: (transitionable: ITransitionable<S>, transition: T) -> Unit): TransitionRule<S, T> =
-            copy(doAction = func)
+    fun reaction(func: (transition: T) -> Unit): TransitionRule<S, T> = copy(_reaction = func)
 
     @Suppress("UNCHECKED_CAST")
-    fun transition(transitionable: ITransitionable<S>, transition: Any): Boolean =
-            onlyIf(transition as T).apply {
-                if (this) doAction(transitionable, transition)
-            }
+    internal fun validate(transition: Any) = _onlyIf(transition as T)
+
+    @Suppress("UNCHECKED_CAST")
+    internal fun performAction(transition: Any) = _reaction(transition as T)
 
 }

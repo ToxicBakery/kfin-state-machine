@@ -12,7 +12,7 @@ fun <N, E> IDirectedGraph<N, E>.mapAcyclicPaths(
             currentPath: MutableList<N>,
             pathSet: MutableSet<List<N>> = mutableSetOf()
     ): Set<List<N>> {
-        return nodeEdges(currentPath.last(), { mapOf() })
+        return edges(currentPath.last(), { mapOf() })
                 .also { edges ->
                     if (edges.isNotEmpty()) {
                         edges.forEach { edge ->

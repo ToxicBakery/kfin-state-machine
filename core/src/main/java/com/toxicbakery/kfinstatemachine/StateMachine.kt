@@ -24,8 +24,8 @@ open class StateMachine<F : FiniteState>(
     override val state: F
         get() = node
 
-    override val availableTransitions: Set<KClass<*>>
-        get() = directedGraph.nodeTransitions(node)
+    override val transitions: Set<KClass<*>>
+        get() = directedGraph.transitions(node)
 
     /**
      * Add a listener to be notified after a machine enters a new state. The listener is returned for convenience.
@@ -55,8 +55,8 @@ open class StateMachine<F : FiniteState>(
         onTransitionListeners.remove(listener)
     }
 
-    override fun performTransition(transition: Any) {
-        directedGraph.nodeEdges(node)
+    override fun transition(transition: Any) {
+        directedGraph.edges(node)
                 .entries
                 .single { it.key == transition.javaClass.kotlin }
                 .also { (_, node) ->
@@ -66,8 +66,8 @@ open class StateMachine<F : FiniteState>(
                 }
     }
 
-    override fun transitionsForTargetState(targetState: F): Set<KClass<*>> =
-            directedGraph.nodeEdges(node)
+    override fun transitionsTo(targetState: F): Set<KClass<*>> =
+            directedGraph.edges(node)
                     .entries
                     .filter { it.value == targetState }
                     .map { it.key }

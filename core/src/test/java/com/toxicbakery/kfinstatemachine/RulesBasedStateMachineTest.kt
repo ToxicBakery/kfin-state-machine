@@ -6,12 +6,8 @@ import com.toxicbakery.kfinstatemachine.EnergyTransition.Release
 import com.toxicbakery.kfinstatemachine.EnergyTransition.Store
 import com.toxicbakery.kfinstatemachine.RulesBasedStateMachine.Companion.transition
 import com.toxicbakery.kfinstatemachine.RulesBasedStateMachineTest.Login.*
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import org.junit.Assert.*
 import org.junit.Test
-import java.util.concurrent.Semaphore
-import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 class RulesBasedStateMachineTest {
@@ -25,9 +21,9 @@ class RulesBasedStateMachineTest {
             get() = name
     }
 
-    sealed class HttpCode(val code: Int) {
-        object Ok : HttpCode(200)
-        object NotAuthorized : HttpCode(401)
+    sealed class HttpCode {
+        object Ok : HttpCode()
+        object NotAuthorized : HttpCode()
     }
 
     data class Credentials(
@@ -43,10 +39,10 @@ class RulesBasedStateMachineTest {
 
         assertEquals(Potential, stateMachine.state)
 
-        stateMachine.performTransition(Release)
+        stateMachine.transition(Release)
         assertEquals(Kinetic, stateMachine.state)
 
-        stateMachine.performTransition(Store)
+        stateMachine.transition(Store)
         assertEquals(Potential, stateMachine.state)
     }
 
@@ -56,56 +52,71 @@ class RulesBasedStateMachineTest {
         val stateMachine = RulesBasedStateMachine(
                 Potential,
                 transition(Potential, Release::class, Kinetic)
-                        .doAction { _, _ -> externalStateTracking = Kinetic },
+                        .reaction { _ -> externalStateTracking = Kinetic },
                 transition(Kinetic, Store::class, Potential)
-                        .doAction { _, _ -> externalStateTracking = Potential })
+                        .reaction { _ -> externalStateTracking = Potential })
 
         assertEquals(Potential, stateMachine.state)
         assertEquals(Potential, externalStateTracking)
 
-        stateMachine.performTransition(Release)
+        stateMachine.transition(Release)
         assertEquals(Kinetic, stateMachine.state)
         assertEquals(Kinetic, externalStateTracking)
 
-        stateMachine.performTransition(Store)
+        stateMachine.transition(Store)
         assertEquals(Potential, stateMachine.state)
         assertEquals(Potential, externalStateTracking)
     }
 
     @Test
     fun performTransition_withRules() {
-        val semaphore = Semaphore(0)
-        val stateMachine = RulesBasedStateMachine(
-                PROMPT,
-                transition(PROMPT, Credentials::class, AUTHORIZING)
-                        .doAction { machine, credentials ->
-                            attemptLogin(credentials)
-                                    .subscribeOn(Schedulers.io())
-                                    .subscribe { httpCode ->
-                                        machine.performTransition(httpCode)
-                                        semaphore.release()
-                                    }
-                        },
-                transition(AUTHORIZING, HttpCode::class, AUTHORIZED)
-                        .onlyIf { it.code == 200 },
-                transition(AUTHORIZING, HttpCode::class, PROMPT)
-                        .onlyIf { it.code == 401 })
 
-        // Attempt auth with incorrect password
-        stateMachine.performTransition(Credentials("user", "incorrect password"))
-        assertEquals(AUTHORIZING, stateMachine.state)
+        class LoginMachine {
 
-        // Wait for login to complete
-        semaphore.tryAcquire(1, TimeUnit.SECONDS)
-        assertEquals(PROMPT, stateMachine.state)
+            private val stateMachine: RulesBasedStateMachine<Login>
+            private val _steps: MutableList<Login> = mutableListOf(PROMPT)
 
-        // Attempt auth with correct password
-        stateMachine.performTransition(Credentials("user", "correct password"))
-        assertEquals(AUTHORIZING, stateMachine.state)
+            val steps: List<Login>
+                get() = _steps
 
-        // Wait for login to complete
-        semaphore.tryAcquire(1, TimeUnit.SECONDS)
-        assertEquals(AUTHORIZED, stateMachine.state)
+            init {
+                stateMachine = RulesBasedStateMachine(
+                        PROMPT,
+                        transition(PROMPT, Credentials::class, AUTHORIZING)
+                                .reaction { credentials ->
+                                    _steps.add(AUTHORIZING)
+                                    doLogin(credentials)
+                                },
+                        transition(AUTHORIZING, HttpCode::class, AUTHORIZED)
+                                .onlyIf { it === HttpCode.Ok }
+                                .reaction { _steps.add(AUTHORIZED) },
+                        transition(AUTHORIZING, HttpCode::class, PROMPT)
+                                .onlyIf { it === HttpCode.NotAuthorized }
+                                .reaction { _steps.add(PROMPT) })
+            }
+
+            fun login(credentials: Credentials) = stateMachine.transition(credentials)
+
+            private fun doLogin(credentials: Credentials) =
+                    when (credentials) {
+                        Credentials("user", "correct password") -> HttpCode.Ok
+                        else -> HttpCode.NotAuthorized
+                    }.let(stateMachine::transition)
+
+        }
+
+        val loginMachine = LoginMachine()
+        loginMachine.login(Credentials("user", "incorrect password"))
+        loginMachine.login(Credentials("user", "correct password"))
+
+        assertEquals(
+                listOf(
+                        PROMPT,
+                        AUTHORIZING,
+                        PROMPT,
+                        AUTHORIZING,
+                        AUTHORIZED),
+                loginMachine.steps)
     }
 
     @Test
@@ -116,7 +127,7 @@ class RulesBasedStateMachineTest {
                 transition(Kinetic, Store::class, Potential))
 
         try {
-            stateMachine.performTransition(Store)
+            stateMachine.transition(Store)
             fail("Exception expected")
         } catch (e: Exception) {
             assertTrue(e.message?.startsWith("Invalid transition ") ?: false)
@@ -132,13 +143,13 @@ class RulesBasedStateMachineTest {
 
         assertEquals(
                 setOf(Release::class),
-                stateMachine.availableTransitions)
+                stateMachine.transitions)
 
-        stateMachine.performTransition(Release)
+        stateMachine.transition(Release)
 
         assertEquals(
                 setOf(Store::class),
-                stateMachine.availableTransitions)
+                stateMachine.transitions)
     }
 
     @Test
@@ -150,33 +161,21 @@ class RulesBasedStateMachineTest {
 
         assertEquals(
                 setOf(Release::class),
-                stateMachine.transitionsForTargetState(Kinetic))
+                stateMachine.transitionsTo(Kinetic))
 
         assertEquals(
                 setOf<KClass<*>>(),
-                stateMachine.transitionsForTargetState(Potential))
+                stateMachine.transitionsTo(Potential))
 
-        stateMachine.performTransition(Release)
+        stateMachine.transition(Release)
 
         assertEquals(
                 setOf(Store::class),
-                stateMachine.transitionsForTargetState(Potential))
+                stateMachine.transitionsTo(Potential))
 
         assertEquals(
                 setOf<KClass<*>>(),
-                stateMachine.transitionsForTargetState(Kinetic))
+                stateMachine.transitionsTo(Kinetic))
     }
-
-    private fun attemptLogin(credentials: Credentials): Observable<HttpCode> =
-            Observable.just(credentials)
-                    .doOnEach({ _ ->
-                        Thread.sleep(10)
-                    })
-                    .map {
-                        when (it) {
-                            Credentials("user", "correct password") -> HttpCode.Ok
-                            else -> HttpCode.NotAuthorized
-                        }
-                    }
 
 }

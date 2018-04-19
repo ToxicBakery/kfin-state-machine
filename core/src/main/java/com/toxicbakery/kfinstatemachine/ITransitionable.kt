@@ -7,16 +7,16 @@ interface ITransitionable<in F> {
     /**
      * Transitions available to the current state.
      */
-    val availableTransitions: Set<KClass<*>>
+    val transitions: Set<KClass<*>>
 
     /**
      * Transition the machine.
      */
-    fun performTransition(transition: Any)
+    fun transition(transition: Any)
 
     /**
      * Get the transition required to move to a given state.
      */
-    fun transitionsForTargetState(targetState: F): Set<KClass<*>>
+    fun transitionsTo(targetState: F): Set<KClass<*>>
 
 }

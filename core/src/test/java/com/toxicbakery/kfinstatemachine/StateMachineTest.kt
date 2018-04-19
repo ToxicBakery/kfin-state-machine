@@ -28,7 +28,7 @@ class StateMachineTest {
                 ),
                 initialState = Potential)
 
-        machine.performTransition(Release)
+        machine.transition(Release)
         assertEquals(Kinetic, machine.state)
     }
 
@@ -38,7 +38,7 @@ class StateMachineTest {
                 directedGraph = directedGraph,
                 initialState = Potential)
 
-        machine.performTransition(InvalidTransition)
+        machine.transition(InvalidTransition)
     }
 
     @Test
@@ -49,7 +49,7 @@ class StateMachineTest {
 
         val semaphore = Semaphore(0)
         val listener = machine.addOnTransitionListener { _ -> semaphore.release() }
-        machine.performTransition(Release)
+        machine.transition(Release)
         assertTrue(semaphore.tryAcquire())
 
         machine.removeOnTransitionListener(listener)
@@ -64,7 +64,7 @@ class StateMachineTest {
 
         val semaphore = Semaphore(0)
         val listener = machine.addOnStateChangeListener { _ -> semaphore.release() }
-        machine.performTransition(Release)
+        machine.transition(Release)
         assertTrue(semaphore.tryAcquire())
 
         machine.removeOnStateChangedListener(listener)
@@ -83,7 +83,7 @@ class StateMachineTest {
                     assertEquals(Release, transitionEvent.transition)
                     assertEquals(Kinetic, transitionEvent.targetState)
                 })
-                .also { machine.performTransition(Release) }
+                .also { machine.transition(Release) }
                 .also(machine::removeOnTransitionListener)
     }
 
@@ -95,7 +95,7 @@ class StateMachineTest {
 
         assertEquals(
                 setOf(Release::class),
-                machine.availableTransitions)
+                machine.transitions)
     }
 
     @Test(expected = Exception::class)
@@ -111,8 +111,8 @@ class StateMachineTest {
                 directedGraph = directedGraph,
                 initialState = Potential)
 
-        assertEquals(setOf<KClass<*>>(), machine.transitionsForTargetState(Potential))
-        assertEquals(setOf<KClass<*>>(Release::class), machine.transitionsForTargetState(Kinetic))
+        assertEquals(setOf<KClass<*>>(), machine.transitionsTo(Potential))
+        assertEquals(setOf<KClass<*>>(Release::class), machine.transitionsTo(Kinetic))
     }
 
 }

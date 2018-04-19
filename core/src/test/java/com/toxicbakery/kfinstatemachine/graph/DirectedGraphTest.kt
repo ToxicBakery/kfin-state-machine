@@ -17,7 +17,7 @@ class DirectedGraphTest {
     fun nodeTransitions() {
         mapOf("node_1" to mapOf("edge_1" to "node_2"))
                 .let { edges -> DirectedGraph(edges) }
-                .nodeTransitions("node_1")
+                .transitions("node_1")
                 .also { transitions -> assertEquals(setOf("edge_1"), transitions) }
     }
 
@@ -25,7 +25,7 @@ class DirectedGraphTest {
     fun nodeEdges() {
         mapOf("node_1" to mapOf("edge_1" to "node_2"))
                 .let { edges -> DirectedGraph(edges) }
-                .nodeEdges("node_1")
+                .edges("node_1")
                 .entries
                 .first()
                 .also { entry: Map.Entry<String, String> ->
@@ -38,7 +38,7 @@ class DirectedGraphTest {
     fun nodeNotInGraph() {
         mapOf("node_1" to mapOf("edge_1" to "node_2"))
                 .let { edges -> DirectedGraph(edges) }
-                .nodeEdges("node_3")
+                .edges("node_3")
     }
 
 }
