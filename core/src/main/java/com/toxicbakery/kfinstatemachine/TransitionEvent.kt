@@ -6,7 +6,7 @@ package com.toxicbakery.kfinstatemachine
  * @param transition event that triggered the state change
  * @param targetState the state that the machine will end in once the transition is complete
  */
-data class TransitionEvent<out F : FiniteState, out T : Transition>(
-        val transition: T,
+data class TransitionEvent<out F>(
+        val transition: Any,
         val targetState: F
 )

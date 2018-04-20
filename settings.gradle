@@ -1,8 +1,9 @@
 include ':core'
-include ':scxml'
-include ':rx'
-include ':benchmark'
+//include ':scxml'
+//include ':rx'
+//include ':benchmark'
 
 // Samples
-include ':samples:countdown'
-include ':samples:dungeon'
+//include ':samples:android'
+//include ':samples:countdown'
+//include ':samples:dungeon'

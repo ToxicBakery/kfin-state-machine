@@ -8,6 +8,7 @@ import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import kotlin.reflect.KClass
 
 class RxMachineTest {
 
@@ -16,47 +17,47 @@ class RxMachineTest {
         object Potential : Energy("potential")
     }
 
-    sealed class EnergyTransition(override val event: String) : Transition {
-        object Store : EnergyTransition("Store")
-        object Release : EnergyTransition("Release")
+    sealed class EnergyTransition {
+        object Store : EnergyTransition()
+        object Release : EnergyTransition()
     }
 
-    private val energyDirectedGraph: IDirectedGraph<Energy, EnergyTransition> = DirectedGraph(
+    private val energyDirectedGraph: IDirectedGraph<Energy, KClass<*>> = DirectedGraph(
             mappedEdges = mapOf(
-                    Potential to mapOf<EnergyTransition, Energy>(Release to Kinetic),
-                    Kinetic to mapOf<EnergyTransition, Energy>(Store to Potential)
+                    Potential to mapOf<KClass<*>, Energy>(Release::class to Kinetic),
+                    Kinetic to mapOf<KClass<*>, Energy>(Store::class to Potential)
             )
     )
 
     @Test
     fun stateObservableTest() {
-        val machine = BaseMachine(energyDirectedGraph, Potential)
+        val machine = StateMachine(energyDirectedGraph, Potential)
         val expectedStates = mutableListOf(
                 Potential,
                 Kinetic
         )
 
-        val disposable = machine.stateObservable
+        val disposable = machine.stateChangeObservable
                 .subscribe { energy: Energy -> assertEquals(expectedStates.removeAt(0), energy) }
 
-        machine.performTransition(Release)
+        machine.transition(Release)
         assertEquals(0, expectedStates.size)
         disposable.dispose()
     }
 
     @Test
     fun transitionObservableTest() {
-        val machine = BaseMachine(energyDirectedGraph, Potential)
+        val machine = StateMachine(energyDirectedGraph, Potential)
         val expectedTransitions = mutableListOf(
                 TransitionEvent(Release, Kinetic),
                 TransitionEvent(Store, Potential)
         )
 
-        val disposable = machine.transitionObservable
+        val disposable = machine.transitionEventObservable
                 .subscribe { transitionEvent -> assertEquals(expectedTransitions.removeAt(0), transitionEvent) }
 
-        machine.performTransition(Release)
-        machine.performTransition(Store)
+        machine.transition(Release)
+        machine.transition(Store)
         assertEquals(0, expectedTransitions.size)
         disposable.dispose()
     }

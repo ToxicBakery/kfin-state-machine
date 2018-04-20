@@ -25,9 +25,9 @@ tasks.jmhReport.doFirst {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 
-    compile "org.openjdk.jmh:jmh-generator-annprocess:1.20"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile project(":core")
+    implementation "org.openjdk.jmh:jmh-generator-annprocess:1.20"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation project(":core")
 }

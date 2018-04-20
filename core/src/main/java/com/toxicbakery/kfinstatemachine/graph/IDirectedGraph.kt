@@ -3,7 +3,7 @@ package com.toxicbakery.kfinstatemachine.graph
 /**
  * Directed graph that defines nodes and edges.
  */
-interface IDirectedGraph<N, L> {
+interface IDirectedGraph<N, E> {
 
     /**
      * All of the nodes defined in the graph.
@@ -13,14 +13,14 @@ interface IDirectedGraph<N, L> {
     /**
      * Edges defined by a node.
      */
-    fun nodeEdges(
+    fun edges(
             node: N,
-            default: () -> Map<L, N> = { throw Exception("Node not in graph.") }
-    ): Map<L, N>
+            defaultValue: () -> Map<E, N> = { throw Exception("Node not in graph.") }
+    ): Map<E, N>
 
     /**
      * Transitions available to a specific node.
      */
-    fun nodeTransitions(node: N): Set<L>
+    fun transitions(node: N): Set<E>
 
 }

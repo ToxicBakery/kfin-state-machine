@@ -53,7 +53,7 @@ public class BenchmarkSuite {
         @Benchmark
         public void machineInstantiation(Blackhole blackhole) {
             blackhole.consume(
-                    new BaseMachine<>(
+                    new StateMachine<>(
                             directedGraph,
                             // Use the last node as the entry to force scanning the entire graph (worst case scenario)
                             lastNode

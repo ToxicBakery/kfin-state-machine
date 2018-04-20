@@ -1,6 +1,6 @@
 package com.toxicbakery.sample.dungeon
 
-import com.toxicbakery.kfinstatemachine.StateMachine
+import com.toxicbakery.kfinstatemachine.IStateMachine
 import java.io.PrintStream
 
 fun main(args: Array<String>) {
@@ -15,10 +15,8 @@ class Application(
         private val outputPrintStream: PrintStream = System.out
 ) {
 
-    private val machine: StateMachine<Point, Label> =
-            MapGenerator(dimensions = MAP_SIZE)
-                    .generateMap()
-                    .let(::mapToDirectedGraph)
+    private val machine: IStateMachine<Point, Label> =
+            MapMachine.createNewMachine(mapSize = MAP_SIZE)
 
     private val availableDirections: List<String>
         get() = machine.availableTransitions
