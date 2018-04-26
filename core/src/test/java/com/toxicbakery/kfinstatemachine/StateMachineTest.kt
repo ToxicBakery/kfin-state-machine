@@ -1,118 +1,180 @@
 package com.toxicbakery.kfinstatemachine
 
-import com.toxicbakery.kfinstatemachine.Energy.*
-import com.toxicbakery.kfinstatemachine.EnergyTransition.*
-import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
-import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
+import com.toxicbakery.kfinstatemachine.Energy.Kinetic
+import com.toxicbakery.kfinstatemachine.Energy.Potential
+import com.toxicbakery.kfinstatemachine.EnergyTransition.Release
+import com.toxicbakery.kfinstatemachine.EnergyTransition.Store
+import com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition
+import com.toxicbakery.kfinstatemachine.StateMachineTest.Login.*
 import org.junit.Assert.*
 import org.junit.Test
-import java.util.concurrent.Semaphore
 import kotlin.reflect.KClass
 
 class StateMachineTest {
 
-    private val directedGraph: IDirectedGraph<Energy, KClass<*>> = DirectedGraph(
-            mappedEdges = mapOf(
-                    Potential to mapOf<KClass<*>, Energy>(Release::class to Kinetic),
-                    Kinetic to mapOf<KClass<*>, Energy>(Store::class to Potential))
-    )
+    enum class Login : FiniteState {
+        PROMPT,
+        AUTHORIZING,
+        AUTHORIZED;
+
+        override val id: String
+            get() = name
+    }
+
+    sealed class HttpCode {
+        object Ok : HttpCode()
+        object NotAuthorized : HttpCode()
+    }
+
+    data class Credentials(
+            val username: String,
+            val password: String)
 
     @Test
     fun performTransition() {
-        val machine = StateMachine(
-                directedGraph = DirectedGraph(
-                        mapOf(
-                                Potential to mapOf<KClass<*>, Energy>(Release::class to Kinetic),
-                                Kinetic to mapOf<KClass<*>, Energy>(Store::class to Potential)
-                        )
-                ),
-                initialState = Potential)
+        val stateMachine = StateMachine(
+                Potential,
+                transition(Potential, Release::class, Kinetic),
+                transition(Kinetic, Store::class, Potential))
 
-        machine.transition(Release)
-        assertEquals(Kinetic, machine.state)
-    }
+        assertEquals(Potential, stateMachine.state)
 
-    @Test(expected = Exception::class)
-    fun findNextNode() {
-        val machine = StateMachine(
-                directedGraph = directedGraph,
-                initialState = Potential)
+        stateMachine.transition(Release)
+        assertEquals(Kinetic, stateMachine.state)
 
-        machine.transition(InvalidTransition)
+        stateMachine.transition(Store)
+        assertEquals(Potential, stateMachine.state)
     }
 
     @Test
-    fun onTransitionListener() {
-        val machine = StateMachine(
-                directedGraph = directedGraph,
-                initialState = Potential)
+    fun performTransition_withActions() {
+        var externalStateTracking: Energy = Potential
+        val stateMachine = StateMachine(
+                Potential,
+                transition(Potential, Release::class, Kinetic)
+                        .reaction { _, _ -> externalStateTracking = Kinetic },
+                transition(Kinetic, Store::class, Potential)
+                        .reaction { _, _ -> externalStateTracking = Potential })
 
-        val semaphore = Semaphore(0)
-        val listener = machine.addOnTransitionListener { _ -> semaphore.release() }
-        machine.transition(Release)
-        assertTrue(semaphore.tryAcquire())
+        assertEquals(Potential, stateMachine.state)
+        assertEquals(Potential, externalStateTracking)
 
-        machine.removeOnTransitionListener(listener)
-        assertFalse(semaphore.tryAcquire())
+        stateMachine.transition(Release)
+        assertEquals(Kinetic, stateMachine.state)
+        assertEquals(Kinetic, externalStateTracking)
+
+        stateMachine.transition(Store)
+        assertEquals(Potential, stateMachine.state)
+        assertEquals(Potential, externalStateTracking)
     }
 
     @Test
-    fun onStateChangeListener() {
-        val machine = StateMachine(
-                directedGraph = directedGraph,
-                initialState = Potential)
+    fun performTransition_withRules() {
+        class LoginMachine {
 
-        val semaphore = Semaphore(0)
-        val listener = machine.addOnStateChangeListener { _ -> semaphore.release() }
-        machine.transition(Release)
-        assertTrue(semaphore.tryAcquire())
+            private val stateMachine: StateMachine<Login>
+            private val _steps: MutableList<Login> = mutableListOf(PROMPT)
 
-        machine.removeOnStateChangedListener(listener)
-        assertFalse(semaphore.tryAcquire())
+            val steps: List<Login>
+                get() = _steps
+
+            init {
+                stateMachine = StateMachine(
+                        PROMPT,
+                        transition(PROMPT, Credentials::class, AUTHORIZING)
+                                .reaction { _, credentials ->
+                                    _steps.add(AUTHORIZING)
+                                    doLogin(credentials)
+                                },
+                        transition(AUTHORIZING, HttpCode::class, AUTHORIZED)
+                                .onlyIf { it === HttpCode.Ok }
+                                .reaction { _, _ -> _steps.add(AUTHORIZED) },
+                        transition(AUTHORIZING, HttpCode::class, PROMPT)
+                                .onlyIf { it === HttpCode.NotAuthorized }
+                                .reaction { _, _ -> _steps.add(PROMPT) })
+            }
+
+            fun login(credentials: Credentials) = stateMachine.transition(credentials)
+
+            private fun doLogin(credentials: Credentials) =
+                    when (credentials) {
+                        Credentials("user", "correct password") -> HttpCode.Ok
+                        else -> HttpCode.NotAuthorized
+                    }.let(stateMachine::transition)
+
+        }
+
+        val loginMachine = LoginMachine()
+        loginMachine.login(Credentials("user", "incorrect password"))
+        loginMachine.login(Credentials("user", "correct password"))
+
+        assertEquals(
+                listOf(
+                        PROMPT,
+                        AUTHORIZING,
+                        PROMPT,
+                        AUTHORIZING,
+                        AUTHORIZED),
+                loginMachine.steps)
     }
 
     @Test
-    fun transitionEvent() {
-        val machine = StateMachine(
-                directedGraph = directedGraph,
-                initialState = Potential)
+    fun performTransition_withError() {
+        val stateMachine = StateMachine(
+                Potential,
+                transition(Potential, Release::class, Kinetic),
+                transition(Kinetic, Store::class, Potential))
 
-        machine.addOnTransitionListener(
-                { transitionEvent ->
-                    assertEquals(TransitionEvent(Release, Kinetic), transitionEvent)
-                    assertEquals(Release, transitionEvent.transition)
-                    assertEquals(Kinetic, transitionEvent.targetState)
-                })
-                .also { machine.transition(Release) }
-                .also(machine::removeOnTransitionListener)
+        try {
+            stateMachine.transition(Store)
+            fail("Exception expected")
+        } catch (e: Exception) {
+            assertTrue(e.message?.startsWith("Invalid transition ") ?: false)
+        }
     }
 
     @Test
     fun availableTransitions() {
-        val machine = StateMachine(
-                directedGraph = directedGraph,
-                initialState = Potential)
+        val stateMachine = StateMachine(
+                Potential,
+                transition(Potential, Release::class, Kinetic),
+                transition(Kinetic, Store::class, Potential))
 
         assertEquals(
                 setOf(Release::class),
-                machine.transitions)
-    }
+                stateMachine.transitions)
 
-    @Test(expected = Exception::class)
-    fun initialStateOutsideGraph() {
-        StateMachine(
-                directedGraph = directedGraph,
-                initialState = InvalidState)
+        stateMachine.transition(Release)
+
+        assertEquals(
+                setOf(Store::class),
+                stateMachine.transitions)
     }
 
     @Test
     fun transitionsForTargetState() {
-        val machine = StateMachine(
-                directedGraph = directedGraph,
-                initialState = Potential)
+        val stateMachine = StateMachine(
+                Potential,
+                transition(Potential, Release::class, Kinetic),
+                transition(Kinetic, Store::class, Potential))
 
-        assertEquals(setOf<KClass<*>>(), machine.transitionsTo(Potential))
-        assertEquals(setOf<KClass<*>>(Release::class), machine.transitionsTo(Kinetic))
+        assertEquals(
+                setOf(Release::class),
+                stateMachine.transitionsTo(Kinetic))
+
+        assertEquals(
+                setOf<KClass<*>>(),
+                stateMachine.transitionsTo(Potential))
+
+        stateMachine.transition(Release)
+
+        assertEquals(
+                setOf(Store::class),
+                stateMachine.transitionsTo(Potential))
+
+        assertEquals(
+                setOf<KClass<*>>(),
+                stateMachine.transitionsTo(Kinetic))
     }
 
 }

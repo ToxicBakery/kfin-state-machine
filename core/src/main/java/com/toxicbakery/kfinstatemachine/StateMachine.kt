@@ -1,94 +1,78 @@
 package com.toxicbakery.kfinstatemachine
 
-import com.toxicbakery.kfinstatemachine.graph.IDirectedGraph
 import kotlin.reflect.KClass
 
-/**
- * State machine implementation dependent on a directed graph.
- *
- * @param directedGraph foundation of the machine defining the valid machine transitions and states
- * @param initialState the entry point of the machine used for determining location in the graph
- */
 open class StateMachine<F : FiniteState>(
-        val directedGraph: IDirectedGraph<F, KClass<*>>,
-        initialState: F
-) : IStateMachine<F>, ITransitionable<F> {
+        initialState: F,
+        private vararg val transitionRules: TransitionRule<F, *>
+) : IStateMachine<F> {
 
-    private var node: F = directedGraph.nodes.find { it == initialState }
-            ?: throw Exception("Invalid initial state $initialState not found in graph.")
+    private var _state: F = initialState
 
-    private val onTransitionListeners: MutableSet<(transitionEvent: TransitionEvent<F>) -> Unit> = linkedSetOf()
-
-    private val onStateChangeListeners: MutableSet<(state: F) -> Unit> = linkedSetOf()
+    private val edges: Set<TransitionRule<F, *>>
+        get() = transitionRules
+                .filter { transitionRule -> transitionRule.oldState == _state }
+                .toSet()
 
     override val state: F
-        get() = node
+        get() = _state
 
     override val transitions: Set<KClass<*>>
-        get() = directedGraph.transitions(node)
+        get() = transitionRules.filter { it.oldState == _state }
+                .map { it.transition }
+                .toSet()
 
-    /**
-     * Add a listener to be notified after a machine enters a new state. The listener is returned for convenience.
-     */
-    fun addOnStateChangeListener(listener: (state: F) -> Unit): (state: F) -> Unit =
-            listener.apply { onStateChangeListeners.add(this) }
-
-    /**
-     * Add a listener to be notified before a machine enters a new state. The listener is returned for convenience.
-     */
-    fun addOnTransitionListener(
-            listener: (transitionEvent: TransitionEvent<F>) -> Unit
-    ): (transitionEvent: TransitionEvent<F>) -> Unit =
-            listener.apply { onTransitionListeners.add(this) }
-
-    /**
-     * Remove a previously added listener.
-     */
-    fun removeOnStateChangedListener(listener: (state: F) -> Unit) {
-        onStateChangeListeners.remove(listener)
-    }
-
-    /**
-     * Remove a previously added listener.
-     */
-    fun removeOnTransitionListener(listener: (transitionEvent: TransitionEvent<F>) -> Unit) {
-        onTransitionListeners.remove(listener)
-    }
-
-    override fun transition(transition: Any) {
-        directedGraph.edges(node)
-                .entries
-                .single { it.key == transition.javaClass.kotlin }
-                .also { (_, node) ->
-                    moveToNode(
-                            transition = transition,
-                            nextNode = node)
-                }
-    }
+    override fun transition(transition: Any): Unit =
+            edge(transition)
+                    .also { _state = it.newState }
+                    .performReactions(this, transition)
 
     override fun transitionsTo(targetState: F): Set<KClass<*>> =
-            directedGraph.edges(node)
-                    .entries
-                    .filter { it.value == targetState }
-                    .map { it.key }
+            transitionRules
+                    .filter { rule: TransitionRule<F, *> ->
+                        rule.oldState == _state
+                                && rule.newState == targetState
+                    }
+                    .map(TransitionRule<F, *>::transition)
                     .toSet()
 
-    /**
-     * Transitions the machine from the current state to a new state and notifies onTransitionListeners of the event.
-     *
-     * @param transition the transition that triggered the state change
-     * @param nextNode the state the machine will move to once all onTransitionListeners have been notified
-     */
-    protected open fun moveToNode(transition: Any, nextNode: F) {
-        TransitionEvent(transition, nextNode)
-                .also { transitionEvent ->
-                    onTransitionListeners.forEach { transitionListener ->
-                        transitionListener(transitionEvent)
-                    }
-                }
+    @Suppress("UNCHECKED_CAST")
+    private fun edge(transition: Any) = edges
+            .singleOrNull { it.transition.java.isInstance(transition) && it.validate(transition) }
+            ?: throw Exception("Invalid transition `${transition.javaClass.simpleName}` for state `$_state`.")
 
-        node = nextNode
-        onStateChangeListeners.forEach { stateListener -> stateListener(nextNode) }
+    companion object {
+        fun <F : FiniteState, T : Any> transition(oldState: F, transition: KClass<T>, newState: F): TransitionRule<F, T> =
+                TransitionRule(
+                        oldState = oldState,
+                        transition = transition,
+                        newState = newState)
     }
+
+}
+
+data class TransitionRule<F : FiniteState, T : Any>(
+        val oldState: F,
+        val transition: KClass<T>,
+        val newState: F,
+        private val validations: List<(transition: T) -> Boolean> = listOf(),
+        private val reactions: List<(machine: StateMachine<F>, transition: T) -> Unit> = listOf()
+) {
+
+    fun onlyIf(func: (transition: T) -> Boolean): TransitionRule<F, T> =
+            copy(validations = validations.plus(func))
+
+    fun reaction(func: (machine: StateMachine<F>, transition: T) -> Unit): TransitionRule<F, T> =
+            copy(reactions = reactions.plus(func))
+
+    @Suppress("UNCHECKED_CAST")
+    internal fun validate(transition: Any) = validations
+            .fold(true, { acc: Boolean, validation: (transition: T) -> Boolean ->
+                acc && validation(transition as T)
+            })
+
+    @Suppress("UNCHECKED_CAST")
+    internal fun performReactions(machine: StateMachine<F>, transition: Any) = reactions
+            .forEach { func -> func(machine, transition as T) }
 
 }

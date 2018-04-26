@@ -4,14 +4,14 @@ import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.sample.dungeon.Direction.*
 import com.toxicbakery.sample.dungeon.Direction.Companion.DIRECTIONS
 
-fun mapToDirectedGraph(map: Array<Array<Boolean>>): DirectedGraph<Point, Label> =
+fun mapToDirectedGraph(map: Array<Array<Boolean>>): DirectedGraph<Point, Direction> =
         map.map { it.size }
                 .sorted()
                 .also {
                     if (it[0] != it.last() || it[0] != map.size)
                         throw Exception("Map must be square!")
                 }
-                .let { mutableMapOf<Point, MutableMap<Label, Point>>() }
+                .let { mutableMapOf<Point, MutableMap<Direction, Point>>() }
                 .apply {
                     for (y in 0 until map.size)
                         for (x in 0 until map.size)
@@ -22,8 +22,8 @@ fun mapToDirectedGraph(map: Array<Array<Boolean>>): DirectedGraph<Point, Label> 
 private fun createEdges(
         map: Array<Array<Boolean>>,
         point: Point
-): MutableMap<Point, MutableMap<Label, Point>> =
-        mutableMapOf<Point, MutableMap<Label, Point>>()
+): MutableMap<Point, MutableMap<Direction, Point>> =
+        mutableMapOf<Point, MutableMap<Direction, Point>>()
                 .also { parentMap ->
                     DIRECTIONS.forEach { direction: Direction ->
                         when (direction) {
@@ -31,15 +31,14 @@ private fun createEdges(
                             South -> point.copy(y = indexWrap(map.size, point.y + 1))
                             West -> point.copy(x = indexWrap(map.size, point.x - 1))
                             East -> point.copy(x = indexWrap(map.size, point.x + 1))
-                        }.also { target ->
+                        }.let { target ->
                             if (targetIsValid(map, target)) {
-                                Label(direction.shortId)
-                                        .let { label ->
-                                            parentMap.getOrPut(
-                                                    key = point,
-                                                    defaultValue = { mutableMapOf() }
-                                            )[label] = target
-                                        }
+                                direction.also { label ->
+                                    parentMap.getOrPut(
+                                            key = point,
+                                            defaultValue = { mutableMapOf() }
+                                    )[label] = target
+                                }
                             }
                         }
                     }

@@ -1,9 +1,10 @@
 include ':core'
+include ':graph'
 //include ':scxml'
-//include ':rx'
+include ':rx'
 //include ':benchmark'
 
 // Samples
 //include ':samples:android'
-//include ':samples:countdown'
-//include ':samples:dungeon'
+include ':samples:stopwatch'
+include ':samples:dungeon'
