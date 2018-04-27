@@ -174,4 +174,12 @@ class StateMachineTest {
                 stateMachine.transitionsTo(Kinetic))
     }
 
+    @Test
+    fun validateRulesRules() {
+        TransitionRule(Potential, Release::class, Kinetic)
+                .onlyIf { transition -> transition === Release }
+                .onlyIf { transition -> transition === Release }
+                .validate(Release)
+    }
+
 }
