@@ -1,6 +1,5 @@
 package com.toxicbakery.sample.dungeon
 
-import com.toxicbakery.kfinstatemachine.IStateMachine
 import java.io.PrintStream
 
 fun main(args: Array<String>) {
@@ -15,12 +14,7 @@ class Application(
         private val outputPrintStream: PrintStream = System.out
 ) {
 
-    private val machine: IStateMachine<Point, Label> =
-            MapMachine.createNewMachine(mapSize = MAP_SIZE)
-
-    private val availableDirections: List<String>
-        get() = machine.availableTransitions
-                .map(Label::event)
+    private val machine: MapMachine = MapMachine.createNewMachine(mapSize = MAP_SIZE)
 
     private val exploration = Exploration(MAP_SIZE, VIEWABLE_SIZE)
             .apply { addExploredPoint(machine.state) }
@@ -60,25 +54,25 @@ class Application(
 
     private fun doWalk(direction: String) {
         try {
-            machine.performTransitionByName(direction)
+            machine.transition(Direction.fromString(direction))
             exploration.addExploredPoint(machine.state)
             println("You walk to the $direction")
         } catch (e: Exception) {
             println("Invalid direction $direction")
-            availableDirections.also { availableDirections ->
+            machine.availableDirections().also { availableDirections ->
                 if (availableDirections.isNotEmpty())
-                    println("Valid directions ${availableDirections.joinToString()}")
+                    println("Valid directions ${availableDirections.joinToString(transform = Direction::shortId)}")
             }
         }
     }
 
     private fun look() {
-        availableDirections
+        machine.availableDirections()
                 .also { availableDirections ->
                     when {
                         availableDirections.size == 1 -> println("""You look around and realize you are at a paths end.
-                                | A path runs ${availableDirections[0]}""".trimMargin())
-                        else -> println("You look around and see paths to the ${availableDirections.joinToString()}")
+                                | A path runs ${availableDirections.first().shortId}""".trimMargin())
+                        else -> println("You look around and see paths to the ${availableDirections.joinToString(transform = Direction::shortId)}")
                     }
                 }
     }

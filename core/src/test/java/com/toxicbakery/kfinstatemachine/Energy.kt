@@ -1,7 +1,7 @@
 package com.toxicbakery.kfinstatemachine
 
-sealed class Energy(override val id: String) : FiniteState {
-    object Kinetic : Energy("Kinetic")
-    object Potential : Energy("Potential")
-    object InvalidState : Energy("InvalidState")
+sealed class Energy {
+    object Kinetic : Energy()
+    object Potential : Energy()
+    object InvalidState : Energy()
 }

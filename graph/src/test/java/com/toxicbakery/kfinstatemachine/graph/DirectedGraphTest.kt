@@ -41,4 +41,16 @@ class DirectedGraphTest {
                 .edges("node_3")
     }
 
+    @Test
+    fun nodeNotInGraph_withDefault() {
+        mapOf("node_1" to mapOf("edge_1" to "node_2"))
+                .let { edges -> DirectedGraph(edges) }
+                .edges("node_3", { mapOf("edge_3" to "node_1") })
+                .also {
+                    assertEquals(
+                            mapOf("edge_3" to "node_1"),
+                            it)
+                }
+    }
+
 }
