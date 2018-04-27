@@ -3,11 +3,14 @@ Rx bindings for listening to state changes and transition events of a machine.
 
 ## Sample Usage
 ```kotlin
-machine.stateObservable
-   .subscribe { state -> }
+val stateMachine = StateMachine(
+                Potential,
+                transition(Potential, Release::class, Kinetic),
+                transition(Kinetic, Store::class, Potential))
+                .let { stateMachine -> RxStateMachine(stateMachine) }
 
-machine.transitionObservable
-   .subscribe { transitionEvent ->  }
+// Listen for state changes
+stateMachine.observable.subscribe {...}
 ```
 
 ## Install

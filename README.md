@@ -6,40 +6,40 @@ Kotlin library for creating finite state machines.
 
 ## Sample Usage
 ```kotlin
-sealed class Energy(override val id: String) : FiniteState {
-    object Kinetic : Energy("kinetic")
-    object Potential : Energy("potential")
+sealed class Energy {
+    object Kinetic : Energy()
+    object Potential : Energy()
 }
 
-sealed class EnergyTransition(override val event: String) : Transition {
-    object Store : EnergyTransition("Store")
-    object Release : EnergyTransition("Release")
+sealed class EnergyTransition {
+    object Store : EnergyTransition()
+    object Release : EnergyTransition()
 }
 
-val machine = BaseMachine(
-    directedGraph = DirectedGraph(
-        mappedEdges = mapOf(
-            Potential to mapOf<EnergyTransition, Energy>(Release to Kinetic),
-            Kinetic to mapOf<EnergyTransition, Energy>(Store to Potential)
-        )
-    ),
-    initialState = Potential
-)
+val stateMachine = StateMachine(
+        Potential,
+        transition(Potential, Release::class, Kinetic)
+             .reaction { machine, transition -> 
+               // perform business logic when a state changes
+             },
+        transition(Kinetic, Store::class, Potential)
+             .onlyIf { transition ->
+               // Specify rules for ambiguous transitions such as http 
+               // responses that require the error code to be checked 
+             })
 
 // Get the current state, will initially return `Potential`
 machine.state
 
 // Move the machine to `Kinetic`
-machine.performTransition(Release)
-
-// Listen for transition events
-machine.addListener({ transitionEvent -> })
+machine.transition(Release)
 ```
 
 ## Samples
 Samples intend to show various ways the library might be used.
 
  * [Dungeon](samples/dungeon) - MUD style application allowing a player to explore a randomly generated dungeon
+ * [Stopwatch](samples/stopwatch) - Simple stopwatch that counts from zero at one second intervals until stopped.
 
 ## Install
 [Core](core) - includes directed graphs and base state machine implementation
@@ -50,12 +50,6 @@ compile "com.ToxicBakery.kfinstatemachine:core:2.+"
 [RxJava](rx) - includes [Core](core) dependency
 ```groovy
 compile "com.ToxicBakery.kfinstatemachine:rx:2.+"
-```
-
-#### Experimental
-[SCXML](scxml) - includes [Core](core) dependency
-```groovy
-compile "com.ToxicBakery.kfinstatemachine:scxml:2.+"
 ```
 
 [1]:https://en.wikipedia.org/wiki/Finite-state_machine
