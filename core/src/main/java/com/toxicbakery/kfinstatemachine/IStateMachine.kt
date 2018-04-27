@@ -5,12 +5,12 @@ import kotlin.reflect.KClass
 /**
  * State machine interface that requires the ability to transition finite states.
  */
-interface IStateMachine<F> {
+interface IStateMachine<S> {
 
     /**
      * Current state of the machine.
      */
-    val state: F
+    val state: S
 
     /**
      * Transitions available to the current state.
@@ -25,6 +25,6 @@ interface IStateMachine<F> {
     /**
      * Get the transition required to move to a given state.
      */
-    fun transitionsTo(targetState: F): Set<KClass<*>>
+    fun transitionsTo(targetState: S): Set<KClass<*>>
 
 }

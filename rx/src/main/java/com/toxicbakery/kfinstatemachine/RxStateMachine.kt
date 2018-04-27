@@ -5,7 +5,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import kotlin.reflect.KClass
 
-class RxStateMachine<F : FiniteState>(
+class RxStateMachine<F>(
         private val stateMachine: IStateMachine<F>
 ) : IStateMachine<F> {
 

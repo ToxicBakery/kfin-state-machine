@@ -2,19 +2,19 @@ package com.toxicbakery.kfinstatemachine
 
 import kotlin.reflect.KClass
 
-open class StateMachine<F : FiniteState>(
-        initialState: F,
-        private vararg val transitionRules: TransitionRule<F, *>
-) : IStateMachine<F> {
+open class StateMachine<S>(
+        initialState: S,
+        private vararg val transitionRules: TransitionRule<S, *>
+) : IStateMachine<S> {
 
-    private var _state: F = initialState
+    private var _state: S = initialState
 
-    private val edges: Set<TransitionRule<F, *>>
+    private val edges: Set<TransitionRule<S, *>>
         get() = transitionRules
                 .filter { transitionRule -> transitionRule.oldState == _state }
                 .toSet()
 
-    override val state: F
+    override val state: S
         get() = _state
 
     override val transitions: Set<KClass<*>>
@@ -27,13 +27,13 @@ open class StateMachine<F : FiniteState>(
                     .also { _state = it.newState }
                     .performReactions(this, transition)
 
-    override fun transitionsTo(targetState: F): Set<KClass<*>> =
+    override fun transitionsTo(targetState: S): Set<KClass<*>> =
             transitionRules
-                    .filter { rule: TransitionRule<F, *> ->
+                    .filter { rule: TransitionRule<S, *> ->
                         rule.oldState == _state
                                 && rule.newState == targetState
                     }
-                    .map(TransitionRule<F, *>::transition)
+                    .map(TransitionRule<S, *>::transition)
                     .toSet()
 
     @Suppress("UNCHECKED_CAST")
@@ -42,7 +42,7 @@ open class StateMachine<F : FiniteState>(
             ?: throw Exception("Invalid transition `${transition.javaClass.simpleName}` for state `$_state`.")
 
     companion object {
-        fun <F : FiniteState, T : Any> transition(oldState: F, transition: KClass<T>, newState: F): TransitionRule<F, T> =
+        fun <F, T : Any> transition(oldState: F, transition: KClass<T>, newState: F): TransitionRule<F, T> =
                 TransitionRule(
                         oldState = oldState,
                         transition = transition,
@@ -51,18 +51,18 @@ open class StateMachine<F : FiniteState>(
 
 }
 
-data class TransitionRule<F : FiniteState, T : Any>(
-        val oldState: F,
+data class TransitionRule<S, T : Any>(
+        val oldState: S,
         val transition: KClass<T>,
-        val newState: F,
+        val newState: S,
         private val validations: List<(transition: T) -> Boolean> = listOf(),
-        private val reactions: List<(machine: StateMachine<F>, transition: T) -> Unit> = listOf()
+        private val reactions: List<(machine: StateMachine<S>, transition: T) -> Unit> = listOf()
 ) {
 
-    fun onlyIf(func: (transition: T) -> Boolean): TransitionRule<F, T> =
+    fun onlyIf(func: (transition: T) -> Boolean): TransitionRule<S, T> =
             copy(validations = validations.plus(func))
 
-    fun reaction(func: (machine: StateMachine<F>, transition: T) -> Unit): TransitionRule<F, T> =
+    fun reaction(func: (machine: StateMachine<S>, transition: T) -> Unit): TransitionRule<S, T> =
             copy(reactions = reactions.plus(func))
 
     @Suppress("UNCHECKED_CAST")
@@ -72,7 +72,7 @@ data class TransitionRule<F : FiniteState, T : Any>(
             })
 
     @Suppress("UNCHECKED_CAST")
-    internal fun performReactions(machine: StateMachine<F>, transition: Any) = reactions
+    internal fun performReactions(machine: StateMachine<S>, transition: Any) = reactions
             .forEach { func -> func(machine, transition as T) }
 
 }

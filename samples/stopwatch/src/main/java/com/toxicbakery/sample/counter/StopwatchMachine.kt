@@ -1,6 +1,5 @@
 package com.toxicbakery.sample.counter
 
-import com.toxicbakery.kfinstatemachine.FiniteState
 import com.toxicbakery.kfinstatemachine.StateMachine
 import com.toxicbakery.sample.counter.TimerEvent.*
 import com.toxicbakery.sample.counter.TimerState.Running
@@ -10,12 +9,9 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
 import java.util.concurrent.TimeUnit
 
-enum class TimerState : FiniteState {
-    Stopped, Running;
-
-    override val id: String
-        get() = javaClass.simpleName
-
+enum class TimerState {
+    Stopped,
+    Running
 }
 
 sealed class TimerEvent {

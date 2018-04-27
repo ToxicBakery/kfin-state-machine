@@ -12,13 +12,10 @@ import kotlin.reflect.KClass
 
 class StateMachineTest {
 
-    enum class Login : FiniteState {
+    enum class Login {
         PROMPT,
         AUTHORIZING,
-        AUTHORIZED;
-
-        override val id: String
-            get() = name
+        AUTHORIZED
     }
 
     sealed class HttpCode {
