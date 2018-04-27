@@ -58,3 +58,6 @@ compile "com.ToxicBakery.kfinstatemachine:rx:2.+"
 The library depends on gradle for compilation and requires JDK 8 or higher.
 
 `./gradlew build`
+
+## Considerations
+This library originally took a classical approach using a directed graph for state and callbacks for listening to state and transition changes. Thanks to a talk given by Ray Ryan from Square, I created an implementation generally following their state machine API and reworked my examples to fit. The exact slide can be found [here](https://youtu.be/mvBVkU2mCF4?t=2266) and the talk in its whole is worth the watch.
