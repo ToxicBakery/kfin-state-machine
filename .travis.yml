@@ -1,12 +1,10 @@
-sudo: required
+language: java
 
-language: ruby
+jdk:
+- oraclejdk8
 
 install:
 - true
-
-env:
-  DOCKER_IMAGE=openjdk:8-alpine
 
 before_script:
 - chmod +x gradlew
@@ -14,7 +12,7 @@ before_script:
 - echo "Travis branch is in pull request? $TRAVIS_PULL_REQUEST"
 - echo "Travis tag $TRAVIS_TAG"
 - echo "org.gradle.daemon=false" >> gradle.properties
-- "docker pull $DOCKER_IMAGE"
+#- "docker pull $DOCKER_IMAGE"
 
 stages:
   - name: compile
@@ -25,7 +23,8 @@ jobs:
   include:
     - stage: compile
       script:
-      - "docker run -it -v $PWD:/workspace $DOCKER_IMAGE /bin/sh -c \"cd /workspace && ./gradlew clean build\""
+#      - "docker run -it -v $PWD:/workspace $DOCKER_IMAGE /bin/sh -c \"cd /workspace && ./gradlew clean build\""
+      - ./gradlew clean build
       - bash <(curl -s https://codecov.io/bash)
     - stage: deploy
       script:
@@ -34,8 +33,9 @@ jobs:
       - echo -e "signing.keyId=${SIGNING_KEY}" >> "gradle.properties"
       - echo -e "signing.password=${SIGNING_PASSWORD}" >> "gradle.properties"
       - echo -e "signing.secretKeyRingFile=../maven.keystore.gpg" >> "gradle.properties"
-      - echo -e "SONATYPE_USERNAME=${SONATYPE_USERNAME}" >> docker.env
-      - echo -e "SONATYPE_PASSWORD=${SONATYPE_PASSWORD}" >> docker.env
-      - echo -e "TRAVIS_TAG=${TRAVIS_TAG}" >> docker.env
-      - echo -e "TRAVIS_BUILD_NUMBER=${TRAVIS_BUILD_NUMBER}" >> docker.env
-      - "docker run -it --env-file docker.env -v $PWD:/workspace $DOCKER_IMAGE /bin/sh -c \"cd /workspace && ./gradlew uploadArchives\""
+      - ./gradlew uploadArchives
+#      - echo -e "SONATYPE_USERNAME=${SONATYPE_USERNAME}" >> docker.env
+#      - echo -e "SONATYPE_PASSWORD=${SONATYPE_PASSWORD}" >> docker.env
+#      - echo -e "TRAVIS_TAG=${TRAVIS_TAG}" >> docker.env
+#      - echo -e "TRAVIS_BUILD_NUMBER=${TRAVIS_BUILD_NUMBER}" >> docker.env
+#      - "docker run -it --env-file docker.env -v $PWD:/workspace $DOCKER_IMAGE /bin/sh -c \"cd /workspace && ./gradlew uploadArchives\""
