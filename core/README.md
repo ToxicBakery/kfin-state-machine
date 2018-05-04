@@ -5,7 +5,7 @@ Core library providing a base state machine implementation and graph features fo
 [See Main README](../)
 
 ## Install
-Includes directed graphs and base state machine implementation
+Includes base state machine implementation
 ```groovy
 compile "com.ToxicBakery.kfinstatemachine:core:2.+"
 ```

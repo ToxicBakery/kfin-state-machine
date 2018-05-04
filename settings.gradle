@@ -1,5 +1,6 @@
 include ':core'
 include ':graph'
+include ':graph-util'
 //include ':scxml'
 include ':rx'
 //include ':benchmark'

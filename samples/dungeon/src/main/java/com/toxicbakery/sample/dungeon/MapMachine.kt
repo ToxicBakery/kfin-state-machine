@@ -2,6 +2,7 @@ package com.toxicbakery.sample.dungeon
 
 import com.toxicbakery.kfinstatemachine.StateMachine
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
+import com.toxicbakery.kfinstatemachine.graph.transitionRules
 import java.util.*
 
 class MapMachine private constructor(
@@ -9,7 +10,7 @@ class MapMachine private constructor(
         initialState: Point
 ) : StateMachine<Point>(
         initialState,
-        *graphToTransitions(directedGraph)
+        directedGraph.transitionRules
 ) {
 
     /**
@@ -28,14 +29,6 @@ class MapMachine private constructor(
                 Random()
                         .nextInt(directedGraph.nodes.size)
                         .let { directedGraph.nodes.elementAt(it) }
-
-        private fun graphToTransitions(directedGraph: DirectedGraph<Point, Direction>) =
-                directedGraph.nodes
-                        .flatMap { leftNode ->
-                            directedGraph.edges(leftNode)
-                                    .map { (edge, rightNode) -> transition(leftNode, edge::class, rightNode) }
-                        }
-                        .toTypedArray()
 
         fun createNewMachine(mapSize: Int): MapMachine =
                 mapToDirectedGraph(generateMap(mapSize))
