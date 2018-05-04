@@ -2,12 +2,21 @@ package com.toxicbakery.kfinstatemachine
 
 import kotlin.reflect.KClass
 
-open class StateMachine<S>(
-        initialState: S,
-        private vararg val transitionRules: TransitionRule<S, *>
-) : IStateMachine<S> {
+open class StateMachine<S> : IStateMachine<S> {
 
-    private var _state: S = initialState
+    private val transitionRules: Array<out TransitionRule<S, *>>
+
+    constructor(initialState: S, vararg transitionRules: TransitionRule<S, *>) {
+        _state = initialState
+        this.transitionRules = transitionRules
+    }
+
+    constructor(initialState: S, transitions: List<TransitionRule<S, *>>) {
+        _state = initialState
+        transitionRules = transitions.toTypedArray()
+    }
+
+    private var _state: S
 
     private val edges: Set<TransitionRule<S, *>>
         get() = transitionRules

@@ -9,6 +9,7 @@ dependencies {
 
     compile project(':core')
     compile project(':graph')
+    compile project(':graph-util')
     compile project(':rx')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
