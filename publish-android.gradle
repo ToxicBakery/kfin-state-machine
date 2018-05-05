@@ -43,10 +43,11 @@ def siteUrl = 'https://github.com/ToxicBakery/kfin-state-machine'
 def gitUrl = 'https://github.com/ToxicBakery/kfin-state-machine.git'
 
 pom {
-    name project.name
+    name POM_ARTIFACT_ID
     if (isAndroid) {
         packaging 'aar'
     }
+    artifactId = POM_ARTIFACT_ID
     description 'Hyperion inspection plugin for kfin-state-machine library when used with Android'
     url siteUrl
 
