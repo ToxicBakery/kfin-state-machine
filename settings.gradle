@@ -5,11 +5,6 @@ include ':graph-util'
 include ':rx'
 //include ':benchmark'
 
-// Tools
-include ':tools:hyperion'
-include ':tools:hyperion-no-op'
-
 // Samples
-include ':samples:android'
 include ':samples:stopwatch'
 include ':samples:dungeon'
