@@ -1,5 +1,9 @@
 buildscript {
     ext.kotlin_version = '1.2.41'
+    ext.hyperion_verion = '0.9.23'
+    ext.supportLibrary_version = '27.1.1'
+    ext.rxjava_version = '2.1.9'
+    ext.contraint_layout_version = '1.1.0'
 
     repositories {
         mavenCentral()
@@ -12,7 +16,8 @@ buildscript {
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.16"
         classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.5"
         classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.7.0"
-        classpath 'com.android.tools.build:gradle:3.1.1'
+        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath "me.tatarka.gradle:pom:1.0"
     }
 }
 

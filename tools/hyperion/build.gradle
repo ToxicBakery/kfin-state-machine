@@ -1,0 +1,42 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+sourceCompatibility = 1.8
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 27
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    resourcePrefix 'kfin_'
+}
+
+dependencies {
+    testImplementation "junit:junit:4.12"
+
+    implementation project(':core')
+    api "com.willowtreeapps.hyperion:hyperion-core:$hyperion_verion"
+    kapt "com.google.auto.service:auto-service:1.0-rc4"
+
+    implementation "com.android.support:appcompat-v7:$supportLibrary_version"
+    implementation "com.android.support:recyclerview-v7:$supportLibrary_version"
+    implementation "com.android.support:design:$supportLibrary_version"
+    implementation "com.android.support.constraint:constraint-layout:$contraint_layout_version"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    implementation "com.jakewharton.timber:timber:4.7.0"
+}
+
+apply from: "${rootDir}/publish-android.gradle"
