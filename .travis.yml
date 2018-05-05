@@ -1,9 +1,7 @@
-language: android
+language: java
 
-android:
-  components:
-  - build-tools-27.0.3
-  - android-27
+jdk:
+- oraclejdk8
 
 install:
 - true
@@ -34,8 +32,8 @@ jobs:
          -in maven.keystore.gpg.enc -out maven.keystore.gpg -d
       - echo -e "signing.keyId=${SIGNING_KEY}" >> "gradle.properties"
       - echo -e "signing.password=${SIGNING_PASSWORD}" >> "gradle.properties"
-#      - echo -e "signing.secretKeyRingFile=../maven.keystore.gpg" >> "gradle.properties"
-      - ./gradlew uploadArchives --debug
+      - echo -e "signing.secretKeyRingFile=../maven.keystore.gpg" >> "gradle.properties"
+      - ./gradlew uploadArchives
 #      - echo -e "SONATYPE_USERNAME=${SONATYPE_USERNAME}" >> docker.env
 #      - echo -e "SONATYPE_PASSWORD=${SONATYPE_PASSWORD}" >> docker.env
 #      - echo -e "TRAVIS_TAG=${TRAVIS_TAG}" >> docker.env

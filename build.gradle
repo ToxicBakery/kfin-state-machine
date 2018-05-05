@@ -16,8 +16,6 @@ buildscript {
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.16"
         classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.5"
         classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.7.0"
-        classpath 'com.android.tools.build:gradle:3.1.2'
-        classpath "me.tatarka.gradle:pom:1.0"
     }
 }
 
@@ -29,12 +27,6 @@ allprojects {
         mavenCentral()
         jcenter()
         google()
-    }
-}
-
-gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.allTasks.any { it instanceof Sign }) {
-        allprojects { ext."signing.secretKeyRingFile" = "${rootDir}/maven.keystore.gpg" }
     }
 }
 
