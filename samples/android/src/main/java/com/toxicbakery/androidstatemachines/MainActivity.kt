@@ -9,16 +9,22 @@ import android.support.v7.app.AppCompatActivity
 import android.view.animation.AccelerateDecelerateInterpolator
 import com.toxicbakery.androidstatemachines.ViewActions.Animate
 import com.toxicbakery.androidstatemachines.ViewState.*
-import com.toxicbakery.kfinstatemachine.FiniteState
-import com.toxicbakery.kfinstatemachine.RulesBasedStateMachine
+import com.toxicbakery.kfinstatemachine.KfinPlugin
+import com.toxicbakery.kfinstatemachine.RxStateMachine
+import com.toxicbakery.kfinstatemachine.StateMachine
+import com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
 
-class MainActivity : AppCompatActivity(), StateListener<ViewState> {
+class MainActivity : AppCompatActivity() {
 
     private val rootView: ConstraintLayout by lazy { findViewById<ConstraintLayout>(R.id.root_view) }
-    private val contraintSetDefault: ConstraintSet = ConstraintSet()
-    private val contraintSetAlt: ConstraintSet = ConstraintSet()
+    private val constraintSetDefault: ConstraintSet = ConstraintSet()
+    private val constraintSetAlt: ConstraintSet = ConstraintSet()
 
     private lateinit var viewStateMachine: ViewStateMachine
+    private var viewStateDisposable: Disposable = Disposables.disposed()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,12 +35,17 @@ class MainActivity : AppCompatActivity(), StateListener<ViewState> {
                 ?.let { stateName -> valueOf(stateName) }
                 ?: DEFAULT
 
-        viewStateMachine = ViewStateMachine(initialState, this)
+        viewStateMachine = ViewStateMachine(initialState)
+        viewStateDisposable = viewStateMachine.observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(::onNewState)
 
-        contraintSetDefault.clone(rootView)
-        contraintSetAlt.clone(this, R.layout.activity_main_alt)
+        constraintSetDefault.clone(rootView)
+        constraintSetAlt.clone(this, R.layout.activity_main_alt)
         rootView.setOnClickListener { viewStateMachine.transition(Animate) }
         onNewState(viewStateMachine.state)
+
+        KfinPlugin.registerMachine(MACHINE_VIEW_STATE, viewStateMachine)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -42,10 +53,16 @@ class MainActivity : AppCompatActivity(), StateListener<ViewState> {
         outState.putString(EXTRA_VIEW_STATE, viewStateMachine.state.name)
     }
 
-    override fun onNewState(state: ViewState) {
+    override fun onDestroy() {
+        super.onDestroy()
+        viewStateDisposable.dispose()
+        KfinPlugin.unregisterMachine(MACHINE_VIEW_STATE)
+    }
+
+    private fun onNewState(state: ViewState) {
         when (state) {
-            ViewState.DEFAULT -> contraintSetDefault.applyTo(rootView)
-            ViewState.ALTERNATE -> contraintSetAlt.applyTo(rootView)
+            ViewState.DEFAULT -> constraintSetDefault.applyTo(rootView)
+            ViewState.ALTERNATE -> constraintSetAlt.applyTo(rootView)
         }
 
         val changeBounds = ChangeBounds().apply { interpolator = AccelerateDecelerateInterpolator() }
@@ -54,37 +71,25 @@ class MainActivity : AppCompatActivity(), StateListener<ViewState> {
 
     companion object {
         private const val EXTRA_VIEW_STATE = "EXTRA_VIEW_STATE"
+        private const val MACHINE_VIEW_STATE = "ViewStateMachine"
     }
-}
-
-interface StateListener<in F : FiniteState> {
-    fun onNewState(state: F)
 }
 
 class ViewStateMachine(
-        initialState: ViewState,
-        private val stateListener: StateListener<ViewState>
-) : RulesBasedStateMachine<ViewState>(
-        initialState,
-        transition(DEFAULT, ViewActions::class, ALTERNATE),
-        transition(ALTERNATE, ViewActions::class, DEFAULT)
-) {
-
-    override fun transition(transition: Any) {
-        super.transition(transition)
-        stateListener.onNewState(state)
-    }
-
-}
+        initialState: ViewState
+) : RxStateMachine<ViewState>(
+        StateMachine(
+                initialState,
+                transition(DEFAULT, Animate::class, ALTERNATE),
+                transition(ALTERNATE, Animate::class, DEFAULT)
+        )
+)
 
 sealed class ViewActions {
     object Animate : ViewActions()
 }
 
-enum class ViewState : FiniteState {
+enum class ViewState {
     DEFAULT,
-    ALTERNATE;
-
-    override val id: String
-        get() = name
+    ALTERNATE
 }

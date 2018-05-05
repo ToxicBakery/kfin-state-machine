@@ -9,7 +9,7 @@ dependencies {
 
     implementation project(':core')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "io.reactivex.rxjava2:rxjava:2.1.9"
+    implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
 }
 
 compileKotlin {
@@ -30,4 +30,4 @@ task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
     inputs.dir 'src/main/kotlin'
 }
 
-apply from: '../publish.gradle'
+apply from: "${rootDir}/publish.gradle"

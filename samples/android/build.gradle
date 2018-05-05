@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "com.toxicbakery.androidstatemachines"
         minSdkVersion 21
@@ -14,7 +14,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -24,15 +24,22 @@ android {
 }
 
 dependencies {
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
     testImplementation 'junit:junit:4.12'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    
+    implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    implementation "io.reactivex.rxjava2:rxandroid:2.0.2"
+
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-core:$hyperion_verion"
+    releaseImplementation "com.willowtreeapps.hyperion:hyperion-core-no-op:$hyperion_verion"
+    debugImplementation "com.willowtreeapps.hyperion:hyperion-measurement:$hyperion_verion"
+    debugImplementation project(':tools:hyperion')
+    releaseImplementation project(':tools:hyperion-no-op')
+
+    implementation "com.android.support:appcompat-v7:$supportLibrary_version"
+    implementation "com.android.support:design:$supportLibrary_version"
+    implementation "com.android.support.constraint:constraint-layout:$contraint_layout_version"
+
     implementation project(':core')
+    implementation project(':rx')
 }

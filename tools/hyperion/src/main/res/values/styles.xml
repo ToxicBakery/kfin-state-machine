@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="kfin_AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/kfin_colorWhite</item>
+        <item name="colorPrimary">@color/kfin_colorPrimary</item>
+        <item name="colorPrimaryDark">@color/kfin_colorPrimaryDark</item>
+        <item name="colorAccent">@color/kfin_colorAccent</item>
+    </style>
+
+    <style name="kfin_ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+</resources>

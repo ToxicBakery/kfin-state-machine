@@ -28,4 +28,4 @@ task dokkaJavadoc(type: org.jetbrains.dokka.gradle.DokkaTask) {
     inputs.dir 'src/main/kotlin'
 }
 
-apply from: '../publish.gradle'
+apply from: "${rootDir}/publish.gradle"
