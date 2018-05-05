@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
         onNewState(viewStateMachine.state)
 
         KfinPlugin.registerMachine(MACHINE_VIEW_STATE, viewStateMachine)
-        KfinPlugin.registerMachine("2", viewStateMachine)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
