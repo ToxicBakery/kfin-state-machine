@@ -32,6 +32,12 @@ allprojects {
     }
 }
 
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Sign }) {
+        allprojects { ext."signing.secretKeyRingFile" = "${rootDir}/maven.keystore.gpg" }
+    }
+}
+
 static boolean isTag() { return !System.getenv('TRAVIS_TAG')?.isEmpty() ?: false }
 
 static String buildNumber() { return System.getenv('TRAVIS_BUILD_NUMBER') ?: "0" }
