@@ -21,7 +21,7 @@ buildscript {
 
 allprojects {
     group 'com.ToxicBakery.kfinstatemachine'
-    version "2.1.${buildNumber()}" + (isTag() ? "" : "-SNAPSHOT")
+    version "2.2.${buildNumber()}" + (isTag() ? "" : "-SNAPSHOT")
 
     repositories {
         mavenCentral()
