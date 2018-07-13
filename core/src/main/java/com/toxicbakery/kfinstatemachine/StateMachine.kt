@@ -18,11 +18,6 @@ open class StateMachine<S> : IStateMachine<S> {
 
     private var _state: S
 
-    private val edges: Set<TransitionRule<S, *>>
-        get() = transitionRules
-                .filter { transitionRule -> transitionRule.oldState == _state }
-                .toSet()
-
     override val state: S
         get() = _state
 
@@ -46,11 +41,28 @@ open class StateMachine<S> : IStateMachine<S> {
                     .toSet()
 
     @Suppress("UNCHECKED_CAST")
-    private fun edge(transition: Any) = edges
-            .singleOrNull { it.transition.java.isInstance(transition) && it.validate(transition) }
-            ?: throw Exception("Invalid transition `${transition.javaClass.simpleName}` for state `$_state`.")
+    private fun edge(transition: Any): TransitionRule<S, *> = transitionRules
+            .filter { transitionRule ->
+                transitionRule.oldState == _state
+                        && transitionRule.transition.java.isInstance(transition)
+                        && transitionRule.validate(transition)
+            }
+            .let { transitions: List<TransitionRule<S, *>> ->
+                when {
+                    transitions.isEmpty() ->
+                        throw Exception("Invalid transition `${transition.javaClass.simpleName}` for state `$_state`.\nValid transitions ${this.transitions}")
+                    transitions.size > 1 ->
+                        throw Exception("Ambiguous transition `${transition.javaClass.simpleName}` for state `$_state`.\nMatches ${transitions.toTransitionsString()}.")
+                    else -> transitions.first()
+                }
+            }
 
     companion object {
+        private fun <S> List<TransitionRule<S, *>>.toTransitionsString(): String =
+                joinToString(separator = "\n") { transitionRule ->
+                    "${transitionRule.oldState} -> ${transitionRule.newState}"
+                }
+
         fun <F, T : Any> transition(oldState: F, transition: KClass<T>, newState: F): TransitionRule<F, T> =
                 TransitionRule(
                         oldState = oldState,

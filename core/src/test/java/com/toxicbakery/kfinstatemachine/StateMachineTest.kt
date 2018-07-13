@@ -116,7 +116,7 @@ class StateMachineTest {
     }
 
     @Test
-    fun performTransition_withError() {
+    fun performTransition_invalidTransition() {
         val stateMachine = StateMachine(
                 Potential,
                 transition(Potential, Release::class, Kinetic),
@@ -127,6 +127,22 @@ class StateMachineTest {
             fail("Exception expected")
         } catch (e: Exception) {
             assertTrue(e.message?.startsWith("Invalid transition ") ?: false)
+        }
+    }
+
+    @Test
+    fun performTransition_ambiguousTransition() {
+        val stateMachine = StateMachine(
+                Potential,
+                transition(Potential, Release::class, Kinetic),
+                transition<Energy, Release>(Potential, Release::class, Potential),
+                transition(Kinetic, Store::class, Potential))
+
+        try {
+            stateMachine.transition(Release)
+            fail("Exception expected")
+        } catch (e: Exception) {
+            assertTrue(e.message?.startsWith("Ambiguous transition ") ?: false)
         }
     }
 
