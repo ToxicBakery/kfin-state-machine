@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.41'
+    ext.kotlin_version = '1.2.51'
     ext.hyperion_verion = '0.9.23'
     ext.supportLibrary_version = '27.1.1'
     ext.rxjava_version = '2.1.9'

@@ -9,11 +9,11 @@ open class RxStateMachine<F>(
         private val stateMachine: IStateMachine<F>
 ) : IStateMachine<F> {
 
-    private val subject: Subject<F> by lazy { BehaviorSubject.createDefault(state) }
+    private val subject: Subject<F> = BehaviorSubject.createDefault(state)
 
     val observable: Observable<F> = subject
 
-    override val state: F
+    final override val state: F
         get() = stateMachine.state
 
     override val transitions: Set<KClass<*>>
