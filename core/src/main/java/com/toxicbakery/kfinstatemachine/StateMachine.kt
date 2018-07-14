@@ -6,35 +6,32 @@ open class StateMachine<S> : IStateMachine<S> {
 
     private val transitionRules: Array<out TransitionRule<S, *>>
 
+    final override var state: S
+
     constructor(initialState: S, vararg transitionRules: TransitionRule<S, *>) {
-        _state = initialState
+        state = initialState
         this.transitionRules = transitionRules
     }
 
     constructor(initialState: S, transitions: List<TransitionRule<S, *>>) {
-        _state = initialState
+        state = initialState
         transitionRules = transitions.toTypedArray()
     }
 
-    private var _state: S
-
-    override val state: S
-        get() = _state
-
     override val transitions: Set<KClass<*>>
-        get() = transitionRules.filter { it.oldState == _state }
+        get() = transitionRules.filter { it.oldState == state }
                 .map { it.transition }
                 .toSet()
 
     override fun transition(transition: Any): Unit =
             edge(transition)
-                    .also { _state = it.newState }
+                    .also { state = it.newState }
                     .performReactions(this, transition)
 
     override fun transitionsTo(targetState: S): Set<KClass<*>> =
             transitionRules
                     .filter { rule: TransitionRule<S, *> ->
-                        rule.oldState == _state
+                        rule.oldState == state
                                 && rule.newState == targetState
                     }
                     .map(TransitionRule<S, *>::transition)
@@ -43,16 +40,16 @@ open class StateMachine<S> : IStateMachine<S> {
     @Suppress("UNCHECKED_CAST")
     private fun edge(transition: Any): TransitionRule<S, *> = transitionRules
             .filter { transitionRule ->
-                transitionRule.oldState == _state
+                transitionRule.oldState == state
                         && transitionRule.transition.java.isInstance(transition)
                         && transitionRule.validate(transition)
             }
             .let { transitions: List<TransitionRule<S, *>> ->
                 when {
                     transitions.isEmpty() ->
-                        throw Exception("Invalid transition `${transition.javaClass.simpleName}` for state `$_state`.\nValid transitions ${this.transitions}")
+                        throw Exception("Invalid transition `${transition.javaClass.simpleName}` for state `$state`.\nValid transitions ${this.transitions}")
                     transitions.size > 1 ->
-                        throw Exception("Ambiguous transition `${transition.javaClass.simpleName}` for state `$_state`.\nMatches ${transitions.toTransitionsString()}.")
+                        throw Exception("Ambiguous transition `${transition.javaClass.simpleName}` for state `$state`.\nMatches ${transitions.toTransitionsString()}.")
                     else -> transitions.first()
                 }
             }
@@ -88,9 +85,9 @@ data class TransitionRule<S, T : Any>(
 
     @Suppress("UNCHECKED_CAST")
     internal fun validate(transition: Any) = validations
-            .fold(true, { acc: Boolean, validation: (transition: T) -> Boolean ->
+            .fold(true) { acc: Boolean, validation: (transition: T) -> Boolean ->
                 acc && validation(transition as T)
-            })
+            }
 
     @Suppress("UNCHECKED_CAST")
     internal fun performReactions(machine: StateMachine<S>, transition: Any) = reactions

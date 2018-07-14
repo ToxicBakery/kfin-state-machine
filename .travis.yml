@@ -17,7 +17,7 @@ before_script:
 stages:
   - name: compile
   - name: deploy
-    if: tag IS present OR branch = master
+    if: tag IS present OR (branch = master AND type != pull_request)
 
 jobs:
   include:
