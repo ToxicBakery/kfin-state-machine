@@ -11,13 +11,13 @@ import kotlin.reflect.KClass
 class DirectedGraphKtTest {
 
     @Test
-    fun getTransitionRules() {
+    fun getToTransitionRules() {
         DirectedGraph(
                 mapOf(
                         Potential to mapOf(Release::class to Kinetic),
                         Kinetic to mapOf(Store::class to Potential)
                 ))
-                .transitionRules
+                .toTransitionRules
                 .also { transitions: List<TransitionRule<Energy, out KClass<out Action>>> ->
                     transitions.first { it.oldState == Potential && it.newState == Kinetic }
                     transitions.first { it.oldState == Kinetic && it.newState == Potential }

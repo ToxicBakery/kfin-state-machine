@@ -22,6 +22,6 @@ open class DirectedGraph<N, E>(
     override fun edges(
             node: N,
             defaultValue: () -> Map<E, N>
-    ): Map<E, N> = mappedEdges[node] ?: defaultValue()
+    ): Map<E, N> = mappedEdges.getOrElse(node, defaultValue)
 
 }

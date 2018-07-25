@@ -13,20 +13,27 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.16"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.17"
         classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.5"
         classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.7.0"
     }
 }
 
-allprojects {
+subprojects {
     group 'com.ToxicBakery.kfinstatemachine'
-    version "2.3.${buildNumber()}" + (isTag() ? "" : "-SNAPSHOT")
+    version "2.4.${buildNumber()}" + (isTag() ? "" : "-SNAPSHOT")
 
     repositories {
         mavenCentral()
         jcenter()
         google()
+    }
+
+    tasks.withType(Test) {
+        testLogging {
+            showStandardStreams = true
+            events 'passed', 'failed'
+        }
     }
 }
 
