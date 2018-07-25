@@ -1,3 +1,9 @@
+enableFeaturePreview('GRADLE_METADATA')
+
+// Common code
+include ':graph-common'
+
+// Exported libraries
 include ':core'
 include ':graph'
 include ':graph-util'

@@ -1,7 +1,8 @@
 package com.toxicbakery.kfinstatemachine.graph
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class DirectedGraphTest {
 
@@ -34,11 +35,14 @@ class DirectedGraphTest {
                 }
     }
 
-    @Test(expected = Exception::class)
+    @Test()
     fun nodeNotInGraph() {
-        mapOf("node_1" to mapOf("edge_1" to "node_2"))
-                .let { edges -> DirectedGraph(edges) }
-                .edges("node_3")
+        try {
+            mapOf("node_1" to mapOf("edge_1" to "node_2"))
+                    .let { edges -> DirectedGraph(edges) }
+                    .edges("node_3")
+            fail("Expected Exception")
+        } catch (e: Exception) {}
     }
 
     @Test
