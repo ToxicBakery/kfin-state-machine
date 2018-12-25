@@ -1,17 +1,7 @@
 apply plugin: 'maven'
-apply plugin: 'maven-publish'
 apply plugin: 'signing'
-apply plugin: 'jacoco'
 
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        html.enabled true
-    }
-}
-check.dependsOn jacocoTestReport
-
-task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+/*task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
@@ -29,7 +19,7 @@ publishing {
             artifact javaSources
         }
     }
-}
+}*/
 
 signing {
     required false
@@ -89,8 +79,8 @@ afterEvaluate { project ->
         }
     }
 
-    artifacts {
+/*    artifacts {
         archives javadocJar
         archives javaSources
-    }
+    }*/
 }

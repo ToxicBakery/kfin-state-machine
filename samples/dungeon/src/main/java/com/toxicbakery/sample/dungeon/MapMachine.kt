@@ -2,7 +2,6 @@ package com.toxicbakery.sample.dungeon
 
 import com.toxicbakery.kfinstatemachine.StateMachine
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
-import com.toxicbakery.kfinstatemachine.graph.toTransitionRules
 import java.util.*
 
 class MapMachine private constructor(
