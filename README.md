@@ -42,14 +42,16 @@ Samples intend to show various ways the library might be used.
  * [Stopwatch](samples/stopwatch) - Simple stopwatch that counts from zero at one second intervals until stopped.
 
 ## Install
-[Core](core) - includes directed graphs and base state machine implementation
+Kfin is now a Kotlin Multiplatform project supporting `js`, `jvm`, and `jvmRx` platforms.
+
+[Core](core) - includes base state machine implementation
 ```groovy
-compile "com.ToxicBakery.kfinstatemachine:core:2.+"
+compile "com.ToxicBakery.kfinstatemachine:kfin-<platform>:3.+"
 ```
 
-[RxJava](rx) - includes [Core](core) dependency
+[Graph](graph) - includes directed graph implementation which can be used to create large state machines more easily
 ```groovy
-compile "com.ToxicBakery.kfinstatemachine:rx:2.+"
+compile "com.ToxicBakery.kfinstatemachine:graph-<platform>:3.+"
 ```
 
 [1]:https://en.wikipedia.org/wiki/Finite-state_machine
