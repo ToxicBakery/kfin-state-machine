@@ -1,10 +1,10 @@
 buildscript {
     ext.kotlin_version = '1.3.11'
     ext.dokka_version = '0.9.17'
-    ext.hyperion_verion = '0.9.23'
-    ext.supportLibrary_version = '27.1.1'
+    ext.hyperion_verion = '0.9.26'
+    ext.supportLibrary_version = '28.0.0'
     ext.rxjava_version = '2.1.9'
-    ext.contraint_layout_version = '1.1.0'
+    ext.contraint_layout_version = '1.1.3'
 
     repositories {
         google()
@@ -21,7 +21,9 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.37"
         classpath "com.github.salomonbrys.gradle.kotlin.js:kotlin-js-gradle-utils:1.0.0"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
-        classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.5"
+        classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
+        classpath 'digital.wup:android-maven-publish:3.6.2'
+        classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.7"
         classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.7.0"
     }
 }

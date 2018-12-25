@@ -1,0 +1,6 @@
+<resources>
+    <public name="kfin_hyperion" type="string">Hyperion-kfin-state-machine</public>
+    <string name="kfin_app_name">kfin-state-machine</string>
+    <string name="kfin_plugin_name">State Machines</string>
+    <string name="kfin_plugin_subtitle">View states for registered state machines</string>
+</resources>
