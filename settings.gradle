@@ -6,6 +6,10 @@ include ':graph'
 //include ':scxml'
 //include ':benchmark'
 
+// Tools
+include ':tools:hyperion'
+include ':tools:hyperion-no-op'
+
 // Samples
 include ':samples:stopwatch'
 include ':samples:dungeon'

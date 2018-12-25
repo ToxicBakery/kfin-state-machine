@@ -1,6 +1,5 @@
 /.idea
 /build
 /.gradle
-*.iml
-maven.keystore.gpg
+/*.iml
 local.properties

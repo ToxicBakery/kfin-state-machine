@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="kfin_colorPrimary">#3F51B5</color>
+    <color name="kfin_colorPrimaryDark">#303F9F</color>
+    <color name="kfin_colorAccent">#FF4081</color>
+    <color name="kfin_colorWhite">#FFF</color>
+</resources>
