@@ -5,6 +5,8 @@ apply plugin: 'org.jetbrains.dokka-android'
 apply plugin: 'digital.wup.android-maven-publish'
 apply plugin: 'signing'
 
+group 'com.ToxicBakery.kfinstatemachine.hyperion'
+
 android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
