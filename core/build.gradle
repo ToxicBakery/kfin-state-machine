@@ -87,6 +87,29 @@ kotlin {
     }
 }
 
+task dokkaGhPages(type: org.jetbrains.dokka.gradle.DokkaTask) {
+    impliedPlatforms = ["Common", "JS", "JVM"]
+    kotlinTasks { [] }
+    outputFormat = 'html'
+    outputDirectory = "${project.projectDir}/gh-pages"
+    sourceRoot {
+        path = kotlin.sourceSets.commonMain.kotlin.srcDirs[0]
+        platforms = ["Common"]
+    }
+    sourceRoot {
+        path = kotlin.sourceSets.jsMain.kotlin.srcDirs[0]
+        platforms = ["JS"]
+    }
+    sourceRoot {
+        path = kotlin.sourceSets.jvmMain.kotlin.srcDirs[0]
+        platforms = ["JVM"]
+    }
+    sourceRoot {
+        path = kotlin.sourceSets.jvmRxMain.kotlin.srcDirs[0]
+        platforms = ["JVM"]
+    }
+}
+
 task dokkaCommon(type: org.jetbrains.dokka.gradle.DokkaTask) {
     impliedPlatforms = ["Common"]
     kotlinTasks { [] }
@@ -130,11 +153,11 @@ task dokkajvm(type: org.jetbrains.dokka.gradle.DokkaTask) {
 
 task dokkajvmRx(type: org.jetbrains.dokka.gradle.DokkaTask) {
     impliedPlatforms = ["JVM", "Common"]
-    kotlinTasks { [] }
+    kotlinTasks { [compileKotlinJvmRx] }
     jdkVersion = 6
     outputFormat = 'html'
     outputDirectory = "$buildDir/javadoc/jvmRx"
-    classpath = [new File("$buildDir/libs/core-jvmrx-${version}.jar")]
+    //classpath = [new File("$buildDir/libs/core-jvmrx-${version}.jar")]
     sourceRoot {
         path = kotlin.sourceSets.commonMain.kotlin.srcDirs[0]
         platforms = ["Common"]
