@@ -1,6 +1,5 @@
 package com.toxicbakery.sample.dungeon
 
-import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.sample.dungeon.Direction.*
 import com.toxicbakery.sample.dungeon.Direction.Companion.DIRECTIONS
 

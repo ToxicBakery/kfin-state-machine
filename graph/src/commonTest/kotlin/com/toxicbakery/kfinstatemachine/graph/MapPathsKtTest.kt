@@ -7,20 +7,21 @@ class MapPathsKtTest {
 
     @Test
     fun mapAllPaths() {
-        mapOf(
-                "node_1" to mapOf(
-                        "edge_1" to "node_2",
-                        "edge_2" to "node_3"
-                ),
-                "node_2" to mapOf(
-                        "edge_3" to "node_3",
-                        "edge_4" to "node_4"
-                ),
-                "node_4" to mapOf(
-                        "edge_5" to "node_2"
-                ))
-                .let { edges -> DirectedGraph(edges) }
-                .mapAcyclicPaths("node_1")
+        DirectedGraph(
+                mappedEdges = listOf(
+                        "node_1" to mapOf(
+                                "edge_1" to "node_2",
+                                "edge_2" to "node_3",
+                                "edge_6" to "node_1"
+                        ),
+                        "node_2" to mapOf(
+                                "edge_3" to "node_3",
+                                "edge_4" to "node_4"
+                        ),
+                        "node_4" to mapOf(
+                                "edge_5" to "node_2"
+                        ))
+        ).mapAcyclicPaths("node_1")
                 .let { foundPaths: Set<List<String>> ->
                     assertEquals(
                             setOf(

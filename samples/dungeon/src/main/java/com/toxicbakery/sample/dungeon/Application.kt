@@ -2,7 +2,7 @@ package com.toxicbakery.sample.dungeon
 
 import java.io.PrintStream
 
-fun main(args: Array<String>) {
+fun main() {
     Application().apply {
         System.console()?.apply {
             while (true) if (gameLoopProcessor(readLine())) break

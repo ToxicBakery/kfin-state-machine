@@ -7,14 +7,17 @@ package com.toxicbakery.kfinstatemachine.graph
  * @param mappedEdges edges of the graph grouped by their left node pointing to `n` nodes
  */
 open class DirectedGraph<N, E>(
-        private val mappedEdges: Map<N, Map<E, N>>
+        private val mappedEdges: List<Pair<N, Map<E, N>>>
 ) : IDirectedGraph<N, E> {
 
-    override val nodes: Set<N> =
-            mappedEdges.values
-                    .flatMap(Map<E, N>::values)
-                    .plus(mappedEdges.keys)
-                    .toSet()
+    override val nodes: Set<N> = mappedEdges
+            .flatMap {
+                mappedEdges.flatMap { (_, edgeMap) ->
+                    edgeMap.values
+                }
+            }
+            .plus(mappedEdges.map { (node, _) -> node })
+            .toSet()
 
     override fun transitions(node: N): Set<E> =
             edges(node).keys
@@ -22,6 +25,15 @@ open class DirectedGraph<N, E>(
     override fun edges(
             node: N,
             defaultValue: () -> Map<E, N>
-    ): Map<E, N> = mappedEdges.getOrElse(node, defaultValue)
+    ): Map<E, N> = mappedEdges
+            .filter { (n, _) -> n == node }
+            .flatMap { (_, edge) -> edge.entries.map { entry -> entry.key to entry.value } }
+            .toMap()
+            .let { map -> if (map.isEmpty()) defaultValue() else map }
+
+    /**
+     * Source graph defining this graph instance.
+     */
+    fun graph(): List<Pair<N, Map<E, N>>> = mappedEdges
 
 }

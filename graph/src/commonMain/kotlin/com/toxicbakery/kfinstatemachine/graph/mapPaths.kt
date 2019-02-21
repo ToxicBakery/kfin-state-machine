@@ -8,26 +8,31 @@ package com.toxicbakery.kfinstatemachine.graph
 fun <N, E> IDirectedGraph<N, E>.mapAcyclicPaths(
         start: N
 ): Set<List<N>> = mapAcyclicPaths(mutableListOf(start))
+        .minus<List<N>>(listOf(start))
 
+/**
+ * Recursively walk unique acyclic paths from a given path and map of known paths.
+ *
+ * @param currentPath path to be walked
+ * @param pathSet paths previously walked
+ */
 private fun <N, E> IDirectedGraph<N, E>.mapAcyclicPaths(
-        currentPath: MutableList<N>,
+        currentPath: List<N>,
         pathSet: MutableSet<List<N>> = mutableSetOf()
 ): Set<List<N>> = edges(currentPath.last()) { mapOf() }
-        .also { edges ->
+        .let { edges ->
             if (edges.isNotEmpty()) {
                 edges.forEach { edge ->
-                    if (currentPath.contains(edge.value)) {
+                    when {
                         // Avoid loops and end the path
-                        pathSet.add(currentPath)
-                    } else {
+                        currentPath.contains(edge.value) -> pathSet.add(currentPath)
                         // Copy the path and start a recursive search
-                        currentPath.plus(edge.value)
-                                .toMutableList()
-                                .let { currentPath ->
-                                    mapAcyclicPaths(currentPath = currentPath, pathSet = pathSet)
-                                }
+                        else -> mapAcyclicPaths(
+                                currentPath = currentPath.plus(edge.value),
+                                pathSet = pathSet
+                        )
                     }
                 }
             } else pathSet.add(currentPath)
+            return pathSet
         }
-        .let { pathSet }
