@@ -178,7 +178,7 @@ class StateMachineTest {
                 stateMachine.transitionsTo(Kinetic))
 
         assertEquals(
-                setOf<KClass<*>>(),
+                setOf(),
                 stateMachine.transitionsTo(Potential))
 
         stateMachine.transition(Release)
@@ -188,7 +188,7 @@ class StateMachineTest {
                 stateMachine.transitionsTo(Potential))
 
         assertEquals(
-                setOf<KClass<*>>(),
+                setOf(),
                 stateMachine.transitionsTo(Kinetic))
     }
 
