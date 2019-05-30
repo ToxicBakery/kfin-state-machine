@@ -1,6 +1,6 @@
 package com.toxicbakery.sample.dungeon
 
-import com.toxicbakery.kfinstatemachine.TransitionRule
+import com.toxicbakery.kfinstatemachine.TransitionDef
 import com.toxicbakery.kfinstatemachine.graph.DirectedGraph
 import com.toxicbakery.sample.dungeon.DirectedGraphKtTest.Action.Release
 import com.toxicbakery.sample.dungeon.DirectedGraphKtTest.Action.Store
@@ -19,7 +19,7 @@ class DirectedGraphKtTest {
                         Kinetic to mapOf(Store::class to Potential)
                 ))
                 .toTransitionRules
-                .also { transitions: List<TransitionRule<Energy, out KClass<out Action>>> ->
+                .also { transitions: List<TransitionDef<Energy, out KClass<out Action>>> ->
                     transitions.first { it.oldState == Potential && it.newState == Kinetic }
                     transitions.first { it.oldState == Kinetic && it.newState == Potential }
                 }

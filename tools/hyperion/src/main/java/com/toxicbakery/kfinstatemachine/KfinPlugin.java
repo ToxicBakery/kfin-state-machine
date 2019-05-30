@@ -11,9 +11,9 @@ import java.util.Map;
 @AutoService(Plugin.class)
 public class KfinPlugin extends Plugin {
 
-    static final Map<String, IStateMachine<?>> registeredMachines = new HashMap<>();
+    static final Map<String, IStateMachine<?, ?>> registeredMachines = new HashMap<>();
 
-    public static void registerMachine(String id, IStateMachine<?> machine) {
+    public static void registerMachine(String id, IStateMachine<?, ?> machine) {
         registeredMachines.put(id, machine);
     }
 

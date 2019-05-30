@@ -20,17 +20,23 @@ sealed class TimerEvent {
     data class Tick(val tick: Long) : TimerEvent()
 }
 
-class StopwatchMachine : StateMachine<TimerState>(
+class StopwatchMachine : StateMachine<TimerState, TimerEvent>(
         Stopped,
-        transition(Stopped, Start::class, Running)
-                .reaction { machine, _ -> (machine as StopwatchMachine).startTicker() },
-        transition(Running, Tick::class, Running)
-                .reaction { _, tick -> println(tick.tick) },
+        transition(Stopped, Start::class, Running),
+        transition(Running, Tick::class, Running),
         transition(Running, Stop::class, Stopped)
-                .reaction { machine, _ -> (machine as StopwatchMachine).stopTicker() }
 ) {
 
     private var tickerDisposable: Disposable = Disposables.disposed()
+
+    override fun transition(transition: TimerEvent) {
+        super.transition(transition)
+        when(transition) {
+            is Start -> startTicker()
+            is Stop -> stopTicker()
+            is Tick -> println(transition.tick)
+        }
+    }
 
     private fun startTicker() {
         tickerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
