@@ -7,7 +7,7 @@ import com.toxicbakery.kfinstatemachine.IStateMachine
 import com.toxicbakery.kfinstatemachine.R
 
 class StateMachineAdapter(
-        private val machines: List<Pair<String, IStateMachine<*>>>
+        private val machines: List<Pair<String, IStateMachine<*, *>>>
 ) : RecyclerView.Adapter<StateMachineHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StateMachineHolder =

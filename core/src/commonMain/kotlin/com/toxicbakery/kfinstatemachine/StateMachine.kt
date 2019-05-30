@@ -2,66 +2,93 @@ package com.toxicbakery.kfinstatemachine
 
 import kotlin.reflect.KClass
 
-open class StateMachine<S> : IStateMachine<S> {
+open class StateMachine<S, T : Any> : IStateMachine<S, T> {
 
-    private val transitionRules: Array<out TransitionRule<S, *>>
+    private val transitionRules: Array<TransitionDef<S, out T>>
+    private val transitionCallbacks: MutableList<TransitionCallback<S, T>> = mutableListOf()
 
     final override var state: S
 
-    constructor(initialState: S, vararg transitionRules: TransitionRule<S, *>) {
+    @Suppress("UNCHECKED_CAST")
+    constructor(
+            initialState: S,
+            vararg transitionRules: TransitionDef<S, out T>
+    ) {
         state = initialState
-        this.transitionRules = transitionRules
+        this.transitionRules = transitionRules as Array<TransitionDef<S, out T>>
     }
 
-    constructor(initialState: S, transitions: List<TransitionRule<S, *>>) {
+    constructor(
+            initialState: S,
+            transitions: List<TransitionDef<S, out T>>
+    ) {
         state = initialState
         transitionRules = transitions.toTypedArray()
     }
 
-    override val transitions: Set<KClass<*>>
-        get() = transitionRules.filter { it.oldState == state }
-                .map { it.transition }
+    @Suppress("UNCHECKED_CAST")
+    override val transitions: Set<KClass<out T>>
+        get() = transitionRules.filter { rule -> rule.oldState == state }
+                .map { rule -> rule.transition as KClass<T> }
                 .toSet()
 
-    override fun transition(transition: Any): Unit =
-            edge(transition)
-                    .also { state = it.newState }
-                    .performReactions(this, transition)
+    override fun transition(transition: T) {
+        val currentState = state
+        val edge = edge(transition)
+        transitionCallbacks.forEach { cb -> cb.enteringState(state, transition, edge.newState) }
+        state = edge.newState
+        transitionCallbacks.forEach { cb -> cb.enteredState(currentState, transition, edge.newState) }
+    }
 
-    override fun transitionsTo(targetState: S): Set<KClass<*>> =
+    @Suppress("UNCHECKED_CAST")
+    override fun transitionsTo(targetState: S): Set<KClass<out T>> =
             transitionRules
-                    .filter { rule: TransitionRule<S, *> ->
+                    .filter { rule: TransitionDef<S, *> ->
                         rule.oldState == state
                                 && rule.newState == targetState
                     }
-                    .map(TransitionRule<S, *>::transition)
+                    .map { it.transition as KClass<T> }
                     .toSet()
 
-    @Suppress("UNCHECKED_CAST")
-    private fun edge(transition: Any): TransitionRule<S, *> = transitionRules
+    /**
+     * Register a callback for state transition updates.
+     *
+     * @param transitionCallback to be registered
+     */
+    fun registerCallback(transitionCallback: TransitionCallback<S, T>) =
+            transitionCallbacks.add(transitionCallback)
+
+    /**
+     * Unregister a callback from state transition updates.
+     *
+     * @param transitionCallback to be unregistered
+     */
+    fun unregisterCallback(transitionCallback: TransitionCallback<S, T>) =
+            transitionCallbacks.remove(transitionCallback)
+
+    private fun edge(transition: Any): TransitionDef<S, *> = transitionRules
             .filter { transitionRule ->
                 transitionRule.oldState == state
                         && transitionRule.transition.isInstance(transition)
-                        && transitionRule.validate(transition)
             }
-            .let { transitions: List<TransitionRule<S, *>> ->
+            .let { transitions: List<TransitionDef<S, *>> ->
                 when {
                     transitions.isEmpty() ->
-                        throw Exception("Invalid transition `$transition` for state `$state`.\nValid transitions ${this.transitions}")
+                        error("Invalid transition `$transition` for state `$state`.\nValid transitions ${this.transitions}")
                     transitions.size > 1 ->
-                        throw Exception("Ambiguous transition `$transition` for state `$state`.\nMatches ${transitions.toTransitionsString()}.")
+                        error("Ambiguous transition `$transition` for state `$state`.\nMatches ${transitions.toTransitionsString()}.")
                     else -> transitions.first()
                 }
             }
 
     companion object {
-        private fun <S> List<TransitionRule<S, *>>.toTransitionsString(): String =
+        private fun <S> List<TransitionDef<S, *>>.toTransitionsString(): String =
                 joinToString(separator = "\n") { transitionRule ->
                     "${transitionRule.oldState} -> ${transitionRule.newState}"
                 }
 
-        fun <F, T : Any> transition(oldState: F, transition: KClass<T>, newState: F): TransitionRule<F, T> =
-                TransitionRule(
+        fun <F, T : Any> transition(oldState: F, transition: KClass<T>, newState: F): TransitionDef<F, T> =
+                TransitionDef(
                         oldState = oldState,
                         transition = transition,
                         newState = newState)
@@ -69,28 +96,67 @@ open class StateMachine<S> : IStateMachine<S> {
 
 }
 
-data class TransitionRule<S, T : Any>(
+data class TransitionDef<S, T : Any>(
         val oldState: S,
         val transition: KClass<T>,
-        val newState: S,
-        private val validations: List<(transition: T) -> Boolean> = listOf(),
-        private val reactions: List<(machine: StateMachine<S>, transition: T) -> Unit> = listOf()
-) {
+        val newState: S
+)
 
-    fun onlyIf(func: (transition: T) -> Boolean): TransitionRule<S, T> =
-            copy(validations = validations.plus(func))
+interface TransitionCallback<S, T : Any> {
 
-    fun reaction(func: (machine: StateMachine<S>, transition: T) -> Unit): TransitionRule<S, T> =
-            copy(reactions = reactions.plus(func))
+    /**
+     * After a state transition has been verified to be legal but has not yet been applied to the machine.
+     *
+     * @param currentState the current state of the machine
+     * @param transition the transition that initiated the state change
+     * @param targetState the resulting state of this transition
+     */
+    fun enteringState(
+            currentState: S,
+            transition: T,
+            targetState: S
+    )
 
-    @Suppress("UNCHECKED_CAST")
-    internal fun validate(transition: Any) = validations
-            .fold(true) { acc: Boolean, validation: (transition: T) -> Boolean ->
-                acc && validation(transition as T)
-            }
-
-    @Suppress("UNCHECKED_CAST")
-    internal fun performReactions(machine: StateMachine<S>, transition: Any) = reactions
-            .forEach { func -> func(machine, transition as T) }
+    /**
+     * After a state transition has been verified to be legal and also applied to a machine.
+     *
+     * @param previousState the previous state of the machine before the transition was applied
+     * @param transition the transition that initiated the state change
+     * @param currentState the resulting state of this transition
+     */
+    fun enteredState(
+            previousState: S,
+            transition: T,
+            currentState: S
+    )
 
 }
+
+/**
+ * Create a transition builder for a given state and transition event.
+ *
+ * @param event that will trigger the transition
+ */
+infix fun <S, T : Any> S.onTransition(event: KClass<out T>): TransitionBuilder<S, T> =
+        ConcreteTransitionBuilder(this, event)
+
+/**
+ * Define how a transition builder should end completing a fully defined transition definition.
+ *
+ * @param newState result of a successful transition
+ */
+infix fun <S, T : Any> TransitionBuilder<S, T>.resultsIn(newState: S): TransitionDef<S, out T> =
+        TransitionDef(startState, event, newState)
+
+/**
+ * Base definition for a partially defined transition.
+ */
+interface TransitionBuilder<out S, out T : Any> {
+    val startState: S
+    val event: KClass<out T>
+}
+
+private class ConcreteTransitionBuilder<out S, out T : Any>(
+        override val startState: S,
+        override val event: KClass<out T>
+) : TransitionBuilder<S, T>

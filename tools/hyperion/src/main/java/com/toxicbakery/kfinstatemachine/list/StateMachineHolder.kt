@@ -12,7 +12,7 @@ class StateMachineHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val textViewId: TextView by bind(R.id.kfin_state_machine_holder_id)
     private val textViewState: TextView by bind(R.id.kfin_state_machine_holder_state)
-    private val textViewTransitons: TextView by bind(R.id.kfin_state_machine_holder_transitions)
+    private val textViewTransitions: TextView by bind(R.id.kfin_state_machine_holder_transitions)
 
     fun bind(
             id: String,
@@ -21,7 +21,7 @@ class StateMachineHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     ) {
         textViewId.text = id
         textViewState.text = state.toString()
-        textViewTransitons.text = transitions
+        textViewTransitions.text = transitions
     }
 
 }

@@ -5,29 +5,12 @@ import com.toxicbakery.kfinstatemachine.Energy.Potential
 import com.toxicbakery.kfinstatemachine.EnergyTransition.Release
 import com.toxicbakery.kfinstatemachine.EnergyTransition.Store
 import com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition
-import com.toxicbakery.kfinstatemachine.StateMachineTest.Login.*
-import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class StateMachineTest {
-
-    enum class Login {
-        PROMPT,
-        AUTHORIZING,
-        AUTHORIZED
-    }
-
-    sealed class HttpCode {
-        object Ok : HttpCode()
-        object NotAuthorized : HttpCode()
-    }
-
-    data class Credentials(
-            val username: String,
-            val password: String)
 
     @Test
     fun performTransition() {
@@ -46,75 +29,37 @@ class StateMachineTest {
     }
 
     @Test
-    fun performTransition_withActions() {
-        var externalStateTracking: Energy = Potential
+    fun performTransition_withList() {
         val stateMachine = StateMachine(
                 Potential,
-                transition(Potential, Release::class, Kinetic)
-                        .reaction { _, _ -> externalStateTracking = Kinetic },
-                transition(Kinetic, Store::class, Potential)
-                        .reaction { _, _ -> externalStateTracking = Potential })
+                listOf(
+                        transition(Potential, Release::class, Kinetic),
+                        transition(Kinetic, Store::class, Potential
+                        )))
 
         assertEquals(Potential, stateMachine.state)
-        assertEquals(Potential, externalStateTracking)
 
         stateMachine.transition(Release)
         assertEquals(Kinetic, stateMachine.state)
-        assertEquals(Kinetic, externalStateTracking)
 
         stateMachine.transition(Store)
         assertEquals(Potential, stateMachine.state)
-        assertEquals(Potential, externalStateTracking)
     }
 
     @Test
-    fun performTransition_withRules() {
-        class LoginMachine {
+    fun performTransition_withInfixFunctions() {
+        val stateMachine = StateMachine(
+                Potential,
+                Potential onTransition Release::class resultsIn Kinetic,
+                Kinetic onTransition Store::class resultsIn Potential)
 
-            private val stateMachine: StateMachine<Login>
-            private val _steps: MutableList<Login> = mutableListOf(PROMPT)
+        assertEquals(Potential, stateMachine.state)
 
-            val steps: List<Login>
-                get() = _steps
+        stateMachine.transition(Release)
+        assertEquals(Kinetic, stateMachine.state)
 
-            init {
-                stateMachine = StateMachine(
-                        PROMPT,
-                        transition(PROMPT, Credentials::class, AUTHORIZING)
-                                .reaction { _, credentials ->
-                                    _steps.add(AUTHORIZING)
-                                    doLogin(credentials)
-                                },
-                        transition(AUTHORIZING, HttpCode::class, AUTHORIZED)
-                                .onlyIf { it === HttpCode.Ok }
-                                .reaction { _, _ -> _steps.add(AUTHORIZED) },
-                        transition(AUTHORIZING, HttpCode::class, PROMPT)
-                                .onlyIf { it === HttpCode.NotAuthorized }
-                                .reaction { _, _ -> _steps.add(PROMPT) })
-            }
-
-            fun login(credentials: Credentials) = stateMachine.transition(credentials)
-
-            private fun doLogin(credentials: Credentials) =
-                    when (credentials) {
-                        Credentials("user", "correct password") -> HttpCode.Ok
-                        else -> HttpCode.NotAuthorized
-                    }.let(stateMachine::transition)
-
-        }
-
-        val loginMachine = LoginMachine()
-        loginMachine.login(Credentials("user", "incorrect password"))
-        loginMachine.login(Credentials("user", "correct password"))
-
-        assertEquals(
-                listOf(
-                        PROMPT,
-                        AUTHORIZING,
-                        PROMPT,
-                        AUTHORIZING,
-                        AUTHORIZED),
-                loginMachine.steps)
+        stateMachine.transition(Store)
+        assertEquals(Potential, stateMachine.state)
     }
 
     @Test
@@ -190,14 +135,6 @@ class StateMachineTest {
         assertEquals(
                 setOf(),
                 stateMachine.transitionsTo(Kinetic))
-    }
-
-    @Test
-    fun validateRulesRules() {
-        TransitionRule(Potential, Release::class, Kinetic)
-                .onlyIf { transition -> transition === Release }
-                .onlyIf { transition -> transition === Release }
-                .validate(Release)
     }
 
 }

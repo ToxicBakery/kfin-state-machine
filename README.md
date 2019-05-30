@@ -18,15 +18,9 @@ sealed class EnergyTransition {
 
 val stateMachine = StateMachine(
         Potential,
-        transition(Potential, Release::class, Kinetic)
-             .reaction { machine, transition -> 
-               // perform business logic when a state changes
-             },
-        transition(Kinetic, Store::class, Potential)
-             .onlyIf { transition ->
-               // Specify rules for ambiguous transitions such as http 
-               // responses that require the error code to be checked 
-             })
+        Potential onEvent Release::class resultsIn Kinetic,
+        Kinetic onEvent Store::class resultsIn Potential
+)
 
 // Get the current state, will initially return `Potential`
 machine.state
@@ -46,12 +40,12 @@ Kfin is now a Kotlin Multiplatform project supporting `js`, `jvm`, and `jvmRx` p
 
 [Core](core) - includes base state machine implementation
 ```groovy
-compile "com.ToxicBakery.kfinstatemachine:kfin-<platform>:3.+"
+compile "com.ToxicBakery.kfinstatemachine:kfin-<platform>:4.+"
 ```
 
 [Graph](graph) - includes directed graph implementation which can be used to create large state machines more easily
 ```groovy
-compile "com.ToxicBakery.kfinstatemachine:graph-<platform>:3.+"
+compile "com.ToxicBakery.kfinstatemachine:graph-<platform>:4.+"
 ```
 
 [1]:https://en.wikipedia.org/wiki/Finite-state_machine
