@@ -5,6 +5,7 @@ plugins {
     id 'signing'
     id 'org.jetbrains.dokka'
     id 'jacoco'
+    id 'nl.fabianm.kotlin.plugin.generated' version '1.3.2'
 }
 
 jacoco {
@@ -111,6 +112,7 @@ task jacocoTestReportJvm(type: JacocoReport) {
 
     reports {
         xml.enabled = true
+        xml.destination file("${buildDir}/reports/jacoco/report.xml")
         html.enabled = true
     }
 }
