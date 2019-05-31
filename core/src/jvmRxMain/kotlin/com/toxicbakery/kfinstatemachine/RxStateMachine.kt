@@ -15,12 +15,12 @@ val <S, T : Any> StateMachine<S, T>.stateObservable: Observable<TransitionEvent<
         emitter.setCancellable { unregisterCallback(rxCallback) }
     }
 
-inline val <S, T : Any> StateMachine<S, T>.enterTransitionObservable: Observable<EnterTransition<S, T>>
+val <S, T : Any> StateMachine<S, T>.enterTransitionObservable: Observable<EnterTransition<S, T>>
     get() = stateObservable
             .filter { event -> event is EnterTransition<S, T> }
             .map { event -> event as EnterTransition<S, T> }
 
-inline val <S, T : Any> StateMachine<S, T>.exitTransitionObservable: Observable<ExitTransition<S, T>>
+val <S, T : Any> StateMachine<S, T>.exitTransitionObservable: Observable<ExitTransition<S, T>>
     get() = stateObservable
             .filter { event -> event is ExitTransition<S, T> }
             .map { event -> event as ExitTransition<S, T> }
