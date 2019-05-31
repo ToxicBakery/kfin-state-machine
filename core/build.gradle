@@ -95,12 +95,19 @@ kotlin {
 task jacocoTestReportJvm(type: JacocoReport) {
     classDirectories = files(
             "$buildDir/classes/kotlin/common/main",
-            "$buildDir/classes/kotlin/jvm/main")
+            "$buildDir/classes/kotlin/jvm/main",
+            "$buildDir/classes/kotlin/jvmRx/main"
+    )
     sourceDirectories = files(
             "src/commonMain/kotlin",
-            "src/jvmMain/kotlin")
+            "src/jvmMain/kotlin",
+            "src/jvmRxMain/kotlin"
+    )
     //noinspection ChangeToOperator
-    executionData = files("$buildDir/jacoco/jvmTest.exec")
+    executionData = files(
+            "$buildDir/jacoco/jvmTest.exec",
+            "$buildDir/jacoco/jvmRxTest.exec"
+    )
 
     reports {
         xml.enabled = true

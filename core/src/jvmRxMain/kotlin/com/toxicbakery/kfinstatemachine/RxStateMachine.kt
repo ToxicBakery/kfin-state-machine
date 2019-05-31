@@ -24,6 +24,7 @@ sealed class TransitionEvent<S, T : Any> {
      * @param targetState the resulting state of this transition
      */
     data class EnterTransition<S, T : Any>(
+            val stateMachine: StateMachine<S, T>,
             val currentState: S,
             val transition: T,
             val targetState: S
@@ -37,6 +38,7 @@ sealed class TransitionEvent<S, T : Any> {
      * @param currentState the resulting state of this transition
      */
     data class ExitTransition<S, T : Any>(
+            val stateMachine: StateMachine<S, T>,
             val previousState: S,
             val transition: T,
             val currentState: S
@@ -54,15 +56,17 @@ private class RxStateCallback<S, T : Any>(
 ) : TransitionCallback<S, T> {
 
     override fun enteringState(
+            stateMachine: StateMachine<S, T>,
             currentState: S,
             transition: T,
             targetState: S
-    ) = emitter.onNext(EnterTransition(currentState, transition, targetState))
+    ) = emitter.onNext(EnterTransition(stateMachine, currentState, transition, targetState))
 
     override fun enteredState(
+            stateMachine: StateMachine<S, T>,
             previousState: S,
             transition: T,
             currentState: S
-    ) = emitter.onNext(ExitTransition(previousState, transition, currentState))
+    ) = emitter.onNext(ExitTransition(stateMachine, previousState, transition, currentState))
 
 }

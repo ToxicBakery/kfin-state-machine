@@ -2,10 +2,20 @@ package com.toxicbakery.kfinstatemachine
 
 import kotlin.reflect.KClass
 
+/**
+ * A basic state machine that is not thread safe.
+ */
 open class StateMachine<S, T : Any> : IStateMachine<S, T> {
 
     private val transitionRules: Array<TransitionDef<S, out T>>
-    private val transitionCallbacks: MutableList<TransitionCallback<S, T>> = mutableListOf()
+
+    private val _transitionCallbacks: MutableList<TransitionCallback<S, T>> = mutableListOf()
+
+    /**
+     * An immutable list of the currently registered callbacks.
+     */
+    val transitionCallbacks: List<TransitionCallback<S, T>>
+        get() = _transitionCallbacks
 
     final override var state: S
 
@@ -35,9 +45,13 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
     override fun transition(transition: T) {
         val currentState = state
         val edge = edge(transition)
-        transitionCallbacks.forEach { cb -> cb.enteringState(state, transition, edge.newState) }
+        transitionCallbacks.forEach { cb ->
+            cb.enteringState(this, state, transition, edge.newState)
+        }
         state = edge.newState
-        transitionCallbacks.forEach { cb -> cb.enteredState(currentState, transition, edge.newState) }
+        transitionCallbacks.forEach { callback ->
+            callback.enteredState(this, currentState, transition, edge.newState)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -56,7 +70,7 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
      * @param transitionCallback to be registered
      */
     fun registerCallback(transitionCallback: TransitionCallback<S, T>) =
-            transitionCallbacks.add(transitionCallback)
+            _transitionCallbacks.add(transitionCallback)
 
     /**
      * Unregister a callback from state transition updates.
@@ -64,7 +78,7 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
      * @param transitionCallback to be unregistered
      */
     fun unregisterCallback(transitionCallback: TransitionCallback<S, T>) =
-            transitionCallbacks.remove(transitionCallback)
+            _transitionCallbacks.remove(transitionCallback)
 
     private fun edge(transition: Any): TransitionDef<S, *> = transitionRules
             .filter { transitionRule ->
@@ -107,11 +121,13 @@ interface TransitionCallback<S, T : Any> {
     /**
      * After a state transition has been verified to be legal but has not yet been applied to the machine.
      *
+     * @param stateMachine the machine notifying the state change
      * @param currentState the current state of the machine
      * @param transition the transition that initiated the state change
      * @param targetState the resulting state of this transition
      */
     fun enteringState(
+            stateMachine: StateMachine<S, T>,
             currentState: S,
             transition: T,
             targetState: S
@@ -120,11 +136,13 @@ interface TransitionCallback<S, T : Any> {
     /**
      * After a state transition has been verified to be legal and also applied to a machine.
      *
+     * @param stateMachine the machine notifying the state change
      * @param previousState the previous state of the machine before the transition was applied
      * @param transition the transition that initiated the state change
      * @param currentState the resulting state of this transition
      */
     fun enteredState(
+            stateMachine: StateMachine<S, T>,
             previousState: S,
             transition: T,
             currentState: S

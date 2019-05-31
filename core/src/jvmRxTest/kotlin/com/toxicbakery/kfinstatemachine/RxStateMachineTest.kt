@@ -30,7 +30,7 @@ class RxStateMachineTest {
 
         var currentState: Energy = stateMachine.state
 
-        stateMachine.stateObservable
+        val disposable = stateMachine.stateObservable
                 .filter { event -> event is ExitTransition }
                 .map { event -> event as ExitTransition<Energy, EnergyTransition> }
                 .map { event -> event.currentState }
@@ -62,7 +62,10 @@ class RxStateMachineTest {
                 setOf(Release::class),
                 stateMachine.transitionsTo(Kinetic))
 
+        // Cleanup
+        disposable.dispose()
 
+        assertEquals(0, stateMachine.transitionCallbacks.size)
     }
 
 }
