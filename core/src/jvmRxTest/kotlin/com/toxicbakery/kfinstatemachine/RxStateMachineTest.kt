@@ -5,7 +5,6 @@ import com.toxicbakery.kfinstatemachine.RxStateMachineTest.Energy.Potential
 import com.toxicbakery.kfinstatemachine.RxStateMachineTest.EnergyTransition.Release
 import com.toxicbakery.kfinstatemachine.RxStateMachineTest.EnergyTransition.Store
 import com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition
-import com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -28,19 +27,21 @@ class RxStateMachineTest {
                 transition(Potential, Release::class, Kinetic),
                 transition(Kinetic, Store::class, Potential))
 
-        var currentState: Energy = stateMachine.state
+        var lastEnterState: Energy = stateMachine.state
+        var lastExitState: Energy = stateMachine.state
 
-        val disposable = stateMachine.stateObservable
-                .filter { event -> event is ExitTransition }
-                .map { event -> event as ExitTransition<Energy, EnergyTransition> }
+        val enterDisposable = stateMachine.enterTransitionObservable
                 .map { event -> event.currentState }
-                .subscribe { state -> currentState = state }
+                .subscribe { state -> lastEnterState = state }
 
-        assertEquals(Potential, currentState)
+        val exitDisposable = stateMachine.exitTransitionObservable
+                .map { event -> event.currentState }
+                .subscribe { state -> lastExitState = state }
 
         // Transition to kinetic and verify the states
         stateMachine.transition(Release)
-        assertEquals(Kinetic, currentState)
+        assertEquals(Potential, lastEnterState)
+        assertEquals(Kinetic, lastExitState)
 
         assertEquals(
                 setOf(Store::class),
@@ -52,7 +53,8 @@ class RxStateMachineTest {
 
         // Transition back to potential and verify the states
         stateMachine.transition(Store)
-        assertEquals(Potential, currentState)
+        assertEquals(Kinetic, lastEnterState)
+        assertEquals(Potential, lastExitState)
 
         assertEquals(
                 setOf(Release::class),
@@ -63,8 +65,9 @@ class RxStateMachineTest {
                 stateMachine.transitionsTo(Kinetic))
 
         // Cleanup
-        disposable.dispose()
-
+        assertEquals(2, stateMachine.transitionCallbacks.size)
+        enterDisposable.dispose()
+        exitDisposable.dispose()
         assertEquals(0, stateMachine.transitionCallbacks.size)
     }
 

@@ -1,6 +1,7 @@
 package com.toxicbakery.kfinstatemachine
 
-import com.toxicbakery.kfinstatemachine.TransitionEvent.*
+import com.toxicbakery.kfinstatemachine.TransitionEvent.EnterTransition
+import com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 
@@ -13,6 +14,16 @@ val <S, T : Any> StateMachine<S, T>.stateObservable: Observable<TransitionEvent<
         registerCallback(rxCallback)
         emitter.setCancellable { unregisterCallback(rxCallback) }
     }
+
+inline val <S, T : Any> StateMachine<S, T>.enterTransitionObservable: Observable<EnterTransition<S, T>>
+    get() = stateObservable
+            .filter { event -> event is EnterTransition<S, T> }
+            .map { event -> event as EnterTransition<S, T> }
+
+inline val <S, T : Any> StateMachine<S, T>.exitTransitionObservable: Observable<ExitTransition<S, T>>
+    get() = stateObservable
+            .filter { event -> event is ExitTransition<S, T> }
+            .map { event -> event as ExitTransition<S, T> }
 
 sealed class TransitionEvent<S, T : Any> {
 
