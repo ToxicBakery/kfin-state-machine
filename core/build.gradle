@@ -4,6 +4,11 @@ plugins {
     id 'com.github.salomonbrys.gradle.kotlin.js.mpp-tests.node'
     id 'signing'
     id 'org.jetbrains.dokka'
+    id 'jacoco'
+}
+
+jacoco {
+    toolVersion = jacoco_version
 }
 
 kotlin {
@@ -86,6 +91,23 @@ kotlin {
         }
     }
 }
+
+task jacocoTestReportJvm(type: JacocoReport) {
+    classDirectories = files(
+            "$buildDir/classes/kotlin/common/main",
+            "$buildDir/classes/kotlin/jvm/main")
+    sourceDirectories = files(
+            "src/commonMain/kotlin",
+            "src/jvmMain/kotlin")
+    //noinspection ChangeToOperator
+    executionData = files("$buildDir/jacoco/jvmTest.exec")
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
 
 task dokkaGhPages(type: org.jetbrains.dokka.gradle.DokkaTask) {
     impliedPlatforms = ["Common", "JS", "JVM"]
@@ -266,5 +288,6 @@ signing {
     sign publishing.publications
 }
 
+build.dependsOn 'jacocoTestReportJvm'
 publish.dependsOn assemble
 publishToMavenLocal.dependsOn assemble
