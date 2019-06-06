@@ -20,27 +20,11 @@ kotlin {
                     jvmTarget = '1.6'
                 }
             }
-            mavenPublication {
-                artifactId = 'kfin-jvm'
-            }
-        }
-        fromPreset(presets.jvm, 'jvmRx') {
-            compilations.all {
-                tasks[compileKotlinTaskName].kotlinOptions {
-                    jvmTarget = '1.6'
-                }
-            }
-            mavenPublication {
-                artifactId = 'kfin-jvmRx'
-            }
         }
         fromPreset(presets.js, 'js') {
             tasks[compilations.main.compileKotlinTaskName].kotlinOptions.moduleKind = "umd"
             kotlinJsNodeTests {
                 thisTarget(js)
-            }
-            mavenPublication {
-                artifactId = 'kfin-js'
             }
         }
     }
@@ -78,37 +62,21 @@ kotlin {
                 implementation 'org.jetbrains.kotlin:kotlin-test-junit'
             }
         }
-        jvmRxMain {
-            dependsOn jvmMain
-            dependencies {
-                implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
-            }
-        }
-        jvmRxTest {
-            dependsOn jvmTest
-            dependencies {
-                implementation 'org.jetbrains.kotlin:kotlin-test-junit'
-            }
-        }
     }
 }
 
 task jacocoTestReportJvm(type: JacocoReport) {
-    classDirectories = files(
+    classDirectories.from(files(
             "$buildDir/classes/kotlin/common/main",
-            "$buildDir/classes/kotlin/jvm/main",
-            "$buildDir/classes/kotlin/jvmRx/main"
-    )
-    sourceDirectories = files(
+            "$buildDir/classes/kotlin/jvm/main"
+    ))
+    sourceDirectories.from(files(
             "src/commonMain/kotlin",
-            "src/jvmMain/kotlin",
-            "src/jvmRxMain/kotlin"
-    )
-    //noinspection ChangeToOperator
-    executionData = files(
-            "$buildDir/jacoco/jvmTest.exec",
-            "$buildDir/jacoco/jvmRxTest.exec"
-    )
+            "src/jvmMain/kotlin"
+    ))
+    executionData.from(files(
+            "$buildDir/jacoco/jvmTest.exec"
+    ))
 
     reports {
         xml.enabled = true
@@ -136,7 +104,7 @@ task dokkaGhPages(type: org.jetbrains.dokka.gradle.DokkaTask) {
         platforms = ["JVM"]
     }
     sourceRoot {
-        path = kotlin.sourceSets.jvmRxMain.kotlin.srcDirs[0]
+        path = project(':rx').file("src/jvmMain/kotlin")
         platforms = ["JVM"]
     }
 }
@@ -182,23 +150,6 @@ task dokkajvm(type: org.jetbrains.dokka.gradle.DokkaTask) {
     }
 }
 
-task dokkajvmRx(type: org.jetbrains.dokka.gradle.DokkaTask) {
-    impliedPlatforms = ["JVM", "Common"]
-    kotlinTasks { [compileKotlinJvmRx] }
-    jdkVersion = 6
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/javadoc/jvmRx"
-    //classpath = [new File("$buildDir/libs/core-jvmrx-${version}.jar")]
-    sourceRoot {
-        path = kotlin.sourceSets.commonMain.kotlin.srcDirs[0]
-        platforms = ["Common"]
-    }
-    sourceRoot {
-        path = kotlin.sourceSets.jvmRxMain.kotlin.srcDirs[0]
-        platforms = ["JVM"]
-    }
-}
-
 task emptySourcesJar(type: Jar) {
     classifier = 'sources'
 }
@@ -216,11 +167,6 @@ task dokkaJavadocJsJar(type: Jar, dependsOn: dokkaJs) {
 task dokkaJavadocjvmJar(type: Jar, dependsOn: dokkajvm) {
     classifier = 'javadoc'
     from "$buildDir/javadoc/jvm"
-}
-
-task dokkaJavadocjvmRxJar(type: Jar, dependsOn: dokkajvmRx) {
-    classifier = 'javadoc'
-    from "$buildDir/javadoc/jvmRx"
 }
 
 publishing {
@@ -266,9 +212,6 @@ publishing {
         publications.getByName('jvm') {
             artifact dokkaJavadocjvmJar
         }
-        publications.getByName('jvmRx') {
-            artifact dokkaJavadocjvmRxJar
-        }
         publications.getByName('kotlinMultiplatform') {
             artifact dokkaJavadocCommonJar
             artifact emptySourcesJar
@@ -300,3 +243,4 @@ signing {
 build.dependsOn 'jacocoTestReportJvm'
 publish.dependsOn assemble
 publishToMavenLocal.dependsOn assemble
+clean.doLast { file(".gradle").delete() }

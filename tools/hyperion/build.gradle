@@ -30,7 +30,7 @@ android {
 dependencies {
     testImplementation "junit:junit:4.12"
 
-    implementation project(path: ':core', configuration: 'jvmRxRuntimeElements')
+    implementation project(path: ':kfin', configuration: 'jvmRuntimeElements')
     api "com.willowtreeapps.hyperion:hyperion-core:$hyperion_verion"
     kapt "com.google.auto.service:auto-service:1.0-rc4"
 

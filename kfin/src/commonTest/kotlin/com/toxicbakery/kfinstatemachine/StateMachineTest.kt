@@ -137,4 +137,41 @@ class StateMachineTest {
                 stateMachine.transitionsTo(Kinetic))
     }
 
+    @Test
+    fun registerCallback() {
+        var callbackCount = 0
+        val callback = object : TransitionCallback<Energy, EnergyTransition> {
+            override fun enteringState(
+                    stateMachine: StateMachine<Energy, EnergyTransition>,
+                    currentState: Energy,
+                    transition: EnergyTransition,
+                    targetState: Energy
+            ) {
+                ++callbackCount
+            }
+
+            override fun enteredState(
+                    stateMachine: StateMachine<Energy, EnergyTransition>,
+                    previousState: Energy,
+                    transition: EnergyTransition,
+                    currentState: Energy
+            ) {
+                ++callbackCount
+            }
+        }
+
+        val stateMachine = StateMachine(
+                Potential,
+                transition(Potential, Release::class, Kinetic),
+                transition(Kinetic, Store::class, Potential))
+                .apply { registerCallback(callback) }
+
+        stateMachine.transition(Release)
+        assertEquals(2, callbackCount)
+
+        stateMachine.unregisterCallback(callback)
+        stateMachine.transition(Store)
+        assertEquals(2, callbackCount)
+    }
+
 }
