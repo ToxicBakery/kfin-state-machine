@@ -1,8 +1,9 @@
 enableFeaturePreview('GRADLE_METADATA')
 
 // Exported libraries
-include ':core'
+include ':kfin'
 include ':graph'
+include ':rx'
 //include ':scxml'
 //include ':benchmark'
 

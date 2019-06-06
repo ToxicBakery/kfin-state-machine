@@ -5,7 +5,7 @@ sourceCompatibility = 1.8
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    implementation project(path: ':core', configuration: 'jvmRuntimeElements')
+    implementation project(path: ':kfin', configuration: 'jvmRuntimeElements')
     implementation project(path: ':graph', configuration: 'jvmRuntimeElements')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "io.reactivex.rxjava2:rxjava:2.1.9"

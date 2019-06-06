@@ -36,8 +36,8 @@ jobs:
             if [ "master" = "$CIRCLE_BRANCH" ]; then
               git config --global user.email $GH_EMAIL
               git config --global user.name $GH_NAME
-              cp -r .circleci core/gh-pages/.circleci
-              cd core/gh-pages
+              cp -r .circleci kfin/gh-pages/.circleci
+              cd kfin/gh-pages
               git init
               git checkout --orphan gh-pages
               git add -A
