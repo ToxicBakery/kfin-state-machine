@@ -1,5 +1,6 @@
 package com.toxicbakery.kfinstatemachine
 
+import kotlin.jvm.Volatile
 import kotlin.reflect.KClass
 
 /**
@@ -17,6 +18,7 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
     val transitionCallbacks: List<TransitionCallback<S, T>>
         get() = _transitionCallbacks
 
+    @Volatile
     final override var state: S
 
     @Suppress("UNCHECKED_CAST")
@@ -43,14 +45,14 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
                 .toSet()
 
     override fun transition(transition: T) {
-        val currentState = state
+        val startState = state
         val edge = edge(transition)
         transitionCallbacks.forEach { cb ->
-            cb.enteringState(this, state, transition, edge.newState)
+            cb.enteringState(this, startState, transition, edge.newState)
         }
         state = edge.newState
         transitionCallbacks.forEach { callback ->
-            callback.enteredState(this, currentState, transition, edge.newState)
+            callback.enteredState(this, startState, transition, edge.newState)
         }
     }
 
