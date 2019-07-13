@@ -1,5 +1,5 @@
 # Kotlin Finite State Machine
-[![CircleCI](https://circleci.com/gh/ToxicBakery/kfin-state-machine.svg?style=svg)](https://circleci.com/gh/ToxicBakery/kfin-state-machine) [![codecov](https://codecov.io/gh/ToxicBakery/kfin-state-machine/branch/master/graph/badge.svg)](https://codecov.io/gh/ToxicBakery/kfin-state-machine) [![Maven Central](https://img.shields.io/maven-central/v/com.ToxicBakery.kfinstatemachine/core.svg)](https://oss.sonatype.org/content/repositories/releases/com/ToxicBakery/kfinstatemachine/core/) [![Maven Central](https://img.shields.io/maven-metadata/v/https/oss.sonatype.org/content/repositories/snapshots/com/ToxicBakery/kfinstatemachine/core/maven-metadata.xml.svg)](https://oss.sonatype.org/content/repositories/snapshots/com/ToxicBakery/kfinstatemachine/)  
+[![CircleCI](https://circleci.com/gh/ToxicBakery/kfin-state-machine.svg?style=svg)](https://circleci.com/gh/ToxicBakery/kfin-state-machine) [![codecov](https://codecov.io/gh/ToxicBakery/kfin-state-machine/branch/master/graph/badge.svg)](https://codecov.io/gh/ToxicBakery/kfin-state-machine) [![Maven Central](https://img.shields.io/maven-central/v/com.ToxicBakery.kfinstatemachine/kfin.svg)](https://oss.sonatype.org/content/repositories/releases/com/ToxicBakery/kfinstatemachine/kfin/) [![Maven Central](https://img.shields.io/maven-metadata/v/https/oss.sonatype.org/content/repositories/snapshots/com/ToxicBakery/kfinstatemachine/kfin/maven-metadata.xml.svg)](https://oss.sonatype.org/content/repositories/snapshots/com/ToxicBakery/kfinstatemachine/)  
 Kotlin library for creating finite state machines.
 
 > It is an abstract machine that can be in exactly one of a finite number of states at any given time. The FSM can change from one state to another in response to some external inputs; the change from one state to another is called a transition. An FSM is defined by a list of its states, its initial state, and the conditions for each transition.  
@@ -39,7 +39,7 @@ Samples intend to show various ways the library might be used.
 ## Install
 Kfin is now a Kotlin Multiplatform project supporting `js`, `jvm`, and `jvmRx` platforms.
 
-[Core](core) - includes base state machine implementation
+[kfin](kfin) - includes base state machine implementation
 ```groovy
 compile "com.ToxicBakery.kfinstatemachine:kfin-<platform>:4.+"
 ```
