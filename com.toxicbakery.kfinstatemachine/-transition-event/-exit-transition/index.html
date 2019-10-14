@@ -1,0 +1,75 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>TransitionEvent.ExitTransition - </title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">com.toxicbakery.kfinstatemachine</a>&nbsp;/&nbsp;<a href="../index.html">TransitionEvent</a>&nbsp;/&nbsp;<a href="./index.html">ExitTransition</a><br/>
+<br/>
+<h1>ExitTransition</h1>
+<code><span class="keyword">data</span> <span class="keyword">class </span><span class="identifier">ExitTransition</span><span class="symbol">&lt;</span><span class="identifier">S</span><span class="symbol">, </span><span class="identifier">T</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../index.html"><span class="identifier">TransitionEvent</span></a><span class="symbol">&lt;</span><a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">,</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code>
+<p><strong>Platform and version requirements:</strong> JVM</p>
+<p>Event signal when a transition has completed.</p>
+<h3>Parameters</h3>
+<p><a name="previousState"></a>
+<code>previousState</code> - the previous state of the machine before the transition was applied</p>
+<p><a name="transition"></a>
+<code>transition</code> - the transition that initiated the state change</p>
+<p><a name="currentState"></a>
+<code>currentState</code> - the resulting state of this transition</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">ExitTransition</span><span class="symbol">(</span><span class="identifier" id="com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition$<init>(((com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.T)), com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.T, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S)/stateMachine">stateMachine</span><span class="symbol">:</span>&nbsp;<span class="identifier">&lt;ERROR CLASS&gt;</span><span class="symbol">&lt;</span><a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">,</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier" id="com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition$<init>(((com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.T)), com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.T, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S)/previousState">previousState</span><span class="symbol">:</span>&nbsp;<a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">, </span><span class="identifier" id="com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition$<init>(((com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.T)), com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.T, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S)/transition">transition</span><span class="symbol">:</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">, </span><span class="identifier" id="com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition$<init>(((com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.T)), com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.T, com.toxicbakery.kfinstatemachine.TransitionEvent.ExitTransition.S)/currentState">currentState</span><span class="symbol">:</span>&nbsp;<a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">)</span></code>
+<p>Event signal when a transition has completed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="current-state.html">currentState</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">currentState</span><span class="symbol">: </span><a href="index.html#S"><span class="identifier">S</span></a></code>
+<p>the resulting state of this transition</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="previous-state.html">previousState</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">previousState</span><span class="symbol">: </span><a href="index.html#S"><span class="identifier">S</span></a></code>
+<p>the previous state of the machine before the transition was applied</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="state-machine.html">stateMachine</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">stateMachine</span><span class="symbol">: </span><span class="identifier">&lt;ERROR CLASS&gt;</span><span class="symbol">&lt;</span><a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">,</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="transition.html">transition</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">transition</span><span class="symbol">: </span><a href="index.html#T"><span class="identifier">T</span></a></code>
+<p>the transition that initiated the state change</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

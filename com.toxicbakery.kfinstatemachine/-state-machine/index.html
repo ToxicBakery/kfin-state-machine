@@ -1,0 +1,113 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>StateMachine - </title>
+<link rel="stylesheet" href="../../style.css">
+</HEAD>
+<BODY>
+<a href="../index.html">com.toxicbakery.kfinstatemachine</a>&nbsp;/&nbsp;<a href="./index.html">StateMachine</a><br/>
+<br/>
+<h1>StateMachine</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">StateMachine</span><span class="symbol">&lt;</span><span class="identifier">S</span><span class="symbol">, </span><span class="identifier">T</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span class="symbol">&gt;</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../-i-state-machine/index.html"><span class="identifier">IStateMachine</span></a><span class="symbol">&lt;</span><a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">,</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code>
+<p><strong>Platform and version requirements:</strong> Common</p>
+<p>A basic state machine that is not thread safe.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">StateMachine</span><span class="symbol">(</span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine$<init>(com.toxicbakery.kfinstatemachine.StateMachine.S, kotlin.Array((com.toxicbakery.kfinstatemachine.TransitionDef((com.toxicbakery.kfinstatemachine.StateMachine.S, com.toxicbakery.kfinstatemachine.StateMachine.T)))))/initialState">initialState</span><span class="symbol">:</span>&nbsp;<a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">, </span><span class="keyword">vararg</span> <span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine$<init>(com.toxicbakery.kfinstatemachine.StateMachine.S, kotlin.Array((com.toxicbakery.kfinstatemachine.TransitionDef((com.toxicbakery.kfinstatemachine.StateMachine.S, com.toxicbakery.kfinstatemachine.StateMachine.T)))))/transitionRules">transitionRules</span><span class="symbol">:</span>&nbsp;<a href="../-transition-def/index.html"><span class="identifier">TransitionDef</span></a><span class="symbol">&lt;</span><a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">,</span>&nbsp;<span class="keyword">out</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">)</span></code><br/>
+<code><span class="identifier">StateMachine</span><span class="symbol">(</span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine$<init>(com.toxicbakery.kfinstatemachine.StateMachine.S, kotlin.collections.List((com.toxicbakery.kfinstatemachine.TransitionDef((com.toxicbakery.kfinstatemachine.StateMachine.S, com.toxicbakery.kfinstatemachine.StateMachine.T)))))/initialState">initialState</span><span class="symbol">:</span>&nbsp;<a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">, </span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine$<init>(com.toxicbakery.kfinstatemachine.StateMachine.S, kotlin.collections.List((com.toxicbakery.kfinstatemachine.TransitionDef((com.toxicbakery.kfinstatemachine.StateMachine.S, com.toxicbakery.kfinstatemachine.StateMachine.T)))))/transitions">transitions</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../-transition-def/index.html"><span class="identifier">TransitionDef</span></a><span class="symbol">&lt;</span><a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">,</span>&nbsp;<span class="keyword">out</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span><span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="state.html">state</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">state</span><span class="symbol">: </span><a href="index.html#S"><span class="identifier">S</span></a></code>
+<p>Current state of the machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="transition-callbacks.html">transitionCallbacks</a></p>
+</td>
+<td>
+<code><span class="keyword">val </span><span class="identifier">transitionCallbacks</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><span class="identifier">List</span></a><span class="symbol">&lt;</span><a href="../-transition-callback/index.html"><span class="identifier">TransitionCallback</span></a><span class="symbol">&lt;</span><a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">,</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code>
+<p>An immutable list of the currently registered callbacks.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="transitions.html">transitions</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">val </span><span class="identifier">transitions</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span class="identifier">Set</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-class/index.html"><span class="identifier">KClass</span></a><span class="symbol">&lt;</span><span class="keyword">out</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code>
+<p>Transitions available to the current state.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="register-callback.html">registerCallback</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">registerCallback</span><span class="symbol">(</span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine$registerCallback(com.toxicbakery.kfinstatemachine.TransitionCallback((com.toxicbakery.kfinstatemachine.StateMachine.S, com.toxicbakery.kfinstatemachine.StateMachine.T)))/transitionCallback">transitionCallback</span><span class="symbol">:</span>&nbsp;<a href="../-transition-callback/index.html"><span class="identifier">TransitionCallback</span></a><span class="symbol">&lt;</span><a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">,</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Register a callback for state transition updates.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="transition.html">transition</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">transition</span><span class="symbol">(</span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine$transition(com.toxicbakery.kfinstatemachine.StateMachine.T)/transition">transition</span><span class="symbol">:</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Transition the machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="transitions-to.html">transitionsTo</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">transitionsTo</span><span class="symbol">(</span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine$transitionsTo(com.toxicbakery.kfinstatemachine.StateMachine.S)/targetState">targetState</span><span class="symbol">:</span>&nbsp;<a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html"><span class="identifier">Set</span></a><span class="symbol">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-class/index.html"><span class="identifier">KClass</span></a><span class="symbol">&lt;</span><span class="keyword">out</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">&gt;</span></code>
+<p>Get the transition required to move to a given state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="unregister-callback.html">unregisterCallback</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">unregisterCallback</span><span class="symbol">(</span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine$unregisterCallback(com.toxicbakery.kfinstatemachine.TransitionCallback((com.toxicbakery.kfinstatemachine.StateMachine.S, com.toxicbakery.kfinstatemachine.StateMachine.T)))/transitionCallback">transitionCallback</span><span class="symbol">:</span>&nbsp;<a href="../-transition-callback/index.html"><span class="identifier">TransitionCallback</span></a><span class="symbol">&lt;</span><a href="index.html#S"><span class="identifier">S</span></a><span class="symbol">,</span>&nbsp;<a href="index.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Unregister a callback from state transition updates.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Companion Object Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="transition.html">transition</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="symbol">&lt;</span><span class="identifier">F</span><span class="symbol">, </span><span class="identifier">T</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-any/index.html"><span class="identifier">Any</span></a><span class="symbol">&gt;</span> <span class="identifier">transition</span><span class="symbol">(</span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine.Companion$transition(com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition.F, kotlin.reflect.KClass((com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition.T)), com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition.F)/oldState">oldState</span><span class="symbol">:</span>&nbsp;<a href="transition.html#F"><span class="identifier">F</span></a><span class="symbol">, </span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine.Companion$transition(com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition.F, kotlin.reflect.KClass((com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition.T)), com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition.F)/transition">transition</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.reflect/-k-class/index.html"><span class="identifier">KClass</span></a><span class="symbol">&lt;</span><a href="transition.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span><span class="symbol">, </span><span class="identifier" id="com.toxicbakery.kfinstatemachine.StateMachine.Companion$transition(com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition.F, kotlin.reflect.KClass((com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition.T)), com.toxicbakery.kfinstatemachine.StateMachine.Companion.transition.F)/newState">newState</span><span class="symbol">:</span>&nbsp;<a href="transition.html#F"><span class="identifier">F</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="../-transition-def/index.html"><span class="identifier">TransitionDef</span></a><span class="symbol">&lt;</span><a href="transition.html#F"><span class="identifier">F</span></a><span class="symbol">,</span>&nbsp;<a href="transition.html#T"><span class="identifier">T</span></a><span class="symbol">&gt;</span></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>
