@@ -3,3 +3,4 @@
 /.gradle
 /*.iml
 local.properties
+/out

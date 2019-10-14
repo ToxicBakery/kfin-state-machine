@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.3.31'
+    ext.kotlin_version = '1.3.50'
     ext.dokka_version = '0.9.17'
     ext.hyperion_verion = '0.9.26'
     ext.supportLibrary_version = '28.0.0'
@@ -17,15 +17,15 @@ buildscript {
         maven { url "https://dl.bintray.com/salomonbrys/gradle-plugins" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.android.tools.build:gradle:3.5.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.37"
-        classpath "com.github.salomonbrys.gradle.kotlin.js:kotlin-js-gradle-utils:1.0.0"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
         classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
         classpath 'digital.wup:android-maven-publish:3.6.2'
         classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.7"
         classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.7.0"
+        classpath "nl.fabianm.kotlin.plugin.generated:plugin-gradle:1.4.0"
     }
 }
 

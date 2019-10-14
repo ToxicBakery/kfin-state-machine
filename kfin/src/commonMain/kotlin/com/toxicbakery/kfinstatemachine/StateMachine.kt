@@ -47,11 +47,12 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
     override fun transition(transition: T) {
         val startState = state
         val edge = edge(transition)
-        transitionCallbacks.forEach { cb ->
-            cb.enteringState(this, startState, transition, edge.newState)
+        val callbacks = transitionCallbacks.toList()
+        callbacks.forEach { callback ->
+            callback.enteringState(this, startState, transition, edge.newState)
         }
         state = edge.newState
-        transitionCallbacks.forEach { callback ->
+        callbacks.forEach { callback ->
             callback.enteredState(this, startState, transition, edge.newState)
         }
     }
