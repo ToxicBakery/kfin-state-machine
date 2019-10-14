@@ -35,7 +35,7 @@ subprojects {
     String buildNumber = System.getenv('CIRCLE_BUILD_NUM') ?: "0"
 
     group 'com.ToxicBakery.kfinstatemachine'
-    version "4.2.$buildNumber" + (isTag ? "" : "-SNAPSHOT")
+    version "4.3.$buildNumber" + (isTag ? "" : "-SNAPSHOT")
 
     repositories {
         mavenCentral()
