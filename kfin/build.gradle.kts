@@ -1,3 +1,5 @@
+import org.jetbrains.dokka.gradle.DokkaTask
+
 plugins {
     kotlin("multiplatform")
     id("maven-publish")
@@ -76,6 +78,10 @@ val jacocoTestReportJvm by tasks.register("jacocoTestReportJvm", JacocoReport::c
         xml.outputLocation.set(file("${buildDir}/reports/jacoco/report.xml"))
         html.required.set(true)
     }
+}
+
+tasks.register("dokkaGhPages", DokkaTask::class) {
+    outputDirectory.set(file("$projectDir/gh-pages"))
 }
 
 tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
