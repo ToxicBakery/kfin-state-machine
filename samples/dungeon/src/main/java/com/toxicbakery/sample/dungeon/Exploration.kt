@@ -1,8 +1,8 @@
 package com.toxicbakery.sample.dungeon
 
 class Exploration(
-        private val size: Int,
-        private val viewableSize: Int
+    private val size: Int,
+    private val viewableSize: Int
 ) {
 
     init {
@@ -12,9 +12,9 @@ class Exploration(
     private val halfViewableSize = viewableSize / 2
 
     private val exploredArea: Array<Array<Boolean>> =
-            Array(size, { _ ->
-                Array(size, { _ -> false })
-            })
+        Array(size, { _ ->
+            Array(size, { _ -> false })
+        })
 
     private val Boolean.mapRepresentation: String
         get() = if (this) " * " else "   "
@@ -23,8 +23,8 @@ class Exploration(
         get() = Point(translate(x), translate(y))
 
     private fun translate(value: Int): Int =
-            if (value < 0) value + size
-            else value % size
+        if (value < 0) value + size
+        else value % size
 
     fun addExploredPoint(point: Point) {
         exploredArea[point.x][point.y] = true
@@ -37,12 +37,13 @@ class Exploration(
             sb.append("|")
             for (x in -halfViewableSize..halfViewableSize) {
                 Point(currentLocation.x + x, currentLocation.y + y).translate
-                        .also { translatedPoint ->
-                            printMapPoint(
-                                    currentLocation = currentLocation,
-                                    plotLocation = translatedPoint)
-                                    .also { sb.append(it) }
-                        }
+                    .also { translatedPoint ->
+                        printMapPoint(
+                            currentLocation = currentLocation,
+                            plotLocation = translatedPoint
+                        )
+                            .also { sb.append(it) }
+                    }
             }
             sb.appendln("|")
         }
@@ -59,10 +60,10 @@ class Exploration(
     }
 
     private fun printMapPoint(
-            currentLocation: Point,
-            plotLocation: Point
+        currentLocation: Point,
+        plotLocation: Point
     ): String =
-            if (currentLocation == plotLocation) " x "
-            else exploredArea[plotLocation.x][plotLocation.y].mapRepresentation
+        if (currentLocation == plotLocation) " x "
+        else exploredArea[plotLocation.x][plotLocation.y].mapRepresentation
 
 }

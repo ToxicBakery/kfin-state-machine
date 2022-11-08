@@ -15,9 +15,9 @@ class StopwatchMachineTest {
         val countdownMachine = StopwatchMachine()
         countdownMachine.transition(Start)
         Observable.interval(0, 1, TimeUnit.SECONDS)
-                .take(5)
-                .toList()
-                .blockingGet()
+            .take(5)
+            .toList()
+            .blockingGet()
 
         countdownMachine.transition(Stop)
         assertEquals(Stopped, countdownMachine.state)

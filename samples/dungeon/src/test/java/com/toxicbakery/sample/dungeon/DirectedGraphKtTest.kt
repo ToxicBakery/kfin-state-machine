@@ -14,15 +14,16 @@ class DirectedGraphKtTest {
     @Test
     fun getToTransitionRules() {
         DirectedGraph(
-                mapOf(
-                        Potential to mapOf(Release::class to Kinetic),
-                        Kinetic to mapOf(Store::class to Potential)
-                ))
-                .toTransitionRules
-                .also { transitions: List<TransitionDef<Energy, out KClass<out Action>>> ->
-                    transitions.first { it.oldState == Potential && it.newState == Kinetic }
-                    transitions.first { it.oldState == Kinetic && it.newState == Potential }
-                }
+            mapOf(
+                Potential to mapOf(Release::class to Kinetic),
+                Kinetic to mapOf(Store::class to Potential)
+            )
+        )
+            .toTransitionRules
+            .also { transitions: List<TransitionDef<Energy, out KClass<out Action>>> ->
+                transitions.first { it.oldState == Potential && it.newState == Kinetic }
+                transitions.first { it.oldState == Kinetic && it.newState == Potential }
+            }
     }
 
     enum class Energy {

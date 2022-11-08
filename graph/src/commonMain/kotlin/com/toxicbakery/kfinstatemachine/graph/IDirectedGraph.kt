@@ -14,8 +14,8 @@ interface IDirectedGraph<N, E> {
      * Edges defined by a node.
      */
     fun edges(
-            node: N,
-            defaultValue: () -> Map<E, N> = { throw Exception("Node not in graph.") }
+        node: N,
+        defaultValue: () -> Map<E, N> = { throw Exception("Node not in graph.") }
     ): Map<E, N>
 
     /**

@@ -23,16 +23,16 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
 
     @Suppress("UNCHECKED_CAST")
     constructor(
-            initialState: S,
-            vararg transitionRules: TransitionDef<S, out T>
+        initialState: S,
+        vararg transitionRules: TransitionDef<S, out T>
     ) {
         state = initialState
         this.transitionRules = transitionRules as Array<TransitionDef<S, out T>>
     }
 
     constructor(
-            initialState: S,
-            transitions: List<TransitionDef<S, out T>>
+        initialState: S,
+        transitions: List<TransitionDef<S, out T>>
     ) {
         state = initialState
         transitionRules = transitions.toTypedArray()
@@ -41,8 +41,8 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
     @Suppress("UNCHECKED_CAST")
     override val transitions: Set<KClass<out T>>
         get() = transitionRules.filter { rule -> rule.oldState == state }
-                .map { rule -> rule.transition as KClass<T> }
-                .toSet()
+            .map { rule -> rule.transition as KClass<T> }
+            .toSet()
 
     override fun transition(transition: T) {
         val startState = state
@@ -59,13 +59,13 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
 
     @Suppress("UNCHECKED_CAST")
     override fun transitionsTo(targetState: S): Set<KClass<out T>> =
-            transitionRules
-                    .filter { rule: TransitionDef<S, *> ->
-                        rule.oldState == state
-                                && rule.newState == targetState
-                    }
-                    .map { it.transition as KClass<T> }
-                    .toSet()
+        transitionRules
+            .filter { rule: TransitionDef<S, *> ->
+                rule.oldState == state
+                        && rule.newState == targetState
+            }
+            .map { it.transition as KClass<T> }
+            .toSet()
 
     /**
      * Register a callback for state transition updates.
@@ -73,7 +73,7 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
      * @param transitionCallback to be registered
      */
     fun registerCallback(transitionCallback: TransitionCallback<S, T>) =
-            _transitionCallbacks.add(transitionCallback)
+        _transitionCallbacks.add(transitionCallback)
 
     /**
      * Unregister a callback from state transition updates.
@@ -81,42 +81,45 @@ open class StateMachine<S, T : Any> : IStateMachine<S, T> {
      * @param transitionCallback to be unregistered
      */
     fun unregisterCallback(transitionCallback: TransitionCallback<S, T>) =
-            _transitionCallbacks.remove(transitionCallback)
+        _transitionCallbacks.remove(transitionCallback)
 
     private fun edge(transition: Any): TransitionDef<S, *> = transitionRules
-            .filter { transitionRule ->
-                transitionRule.oldState == state
-                        && transitionRule.transition.isInstance(transition)
+        .filter { transitionRule ->
+            transitionRule.oldState == state
+                    && transitionRule.transition.isInstance(transition)
+        }
+        .let { transitions: List<TransitionDef<S, *>> ->
+            when {
+                transitions.isEmpty() ->
+                    error("Invalid transition `$transition` for state `$state`.\nValid transitions ${this.transitions}")
+
+                transitions.size > 1 ->
+                    error("Ambiguous transition `$transition` for state `$state`.\nMatches ${transitions.toTransitionsString()}.")
+
+                else -> transitions.first()
             }
-            .let { transitions: List<TransitionDef<S, *>> ->
-                when {
-                    transitions.isEmpty() ->
-                        error("Invalid transition `$transition` for state `$state`.\nValid transitions ${this.transitions}")
-                    transitions.size > 1 ->
-                        error("Ambiguous transition `$transition` for state `$state`.\nMatches ${transitions.toTransitionsString()}.")
-                    else -> transitions.first()
-                }
-            }
+        }
 
     companion object {
         private fun <S> List<TransitionDef<S, *>>.toTransitionsString(): String =
-                joinToString(separator = "\n") { transitionRule ->
-                    "${transitionRule.oldState} -> ${transitionRule.newState}"
-                }
+            joinToString(separator = "\n") { transitionRule ->
+                "${transitionRule.oldState} -> ${transitionRule.newState}"
+            }
 
         fun <F, T : Any> transition(oldState: F, transition: KClass<T>, newState: F): TransitionDef<F, T> =
-                TransitionDef(
-                        oldState = oldState,
-                        transition = transition,
-                        newState = newState)
+            TransitionDef(
+                oldState = oldState,
+                transition = transition,
+                newState = newState
+            )
     }
 
 }
 
 data class TransitionDef<S, T : Any>(
-        val oldState: S,
-        val transition: KClass<T>,
-        val newState: S
+    val oldState: S,
+    val transition: KClass<T>,
+    val newState: S
 )
 
 interface TransitionCallback<S, T : Any> {
@@ -130,10 +133,10 @@ interface TransitionCallback<S, T : Any> {
      * @param targetState the resulting state of this transition
      */
     fun enteringState(
-            stateMachine: StateMachine<S, T>,
-            currentState: S,
-            transition: T,
-            targetState: S
+        stateMachine: StateMachine<S, T>,
+        currentState: S,
+        transition: T,
+        targetState: S
     )
 
     /**
@@ -145,10 +148,10 @@ interface TransitionCallback<S, T : Any> {
      * @param currentState the resulting state of this transition
      */
     fun enteredState(
-            stateMachine: StateMachine<S, T>,
-            previousState: S,
-            transition: T,
-            currentState: S
+        stateMachine: StateMachine<S, T>,
+        previousState: S,
+        transition: T,
+        currentState: S
     )
 
 }
@@ -159,7 +162,7 @@ interface TransitionCallback<S, T : Any> {
  * @param event that will trigger the transition
  */
 infix fun <S, T : Any> S.onTransition(event: KClass<out T>): TransitionBuilder<S, T> =
-        ConcreteTransitionBuilder(this, event)
+    ConcreteTransitionBuilder(this, event)
 
 /**
  * Define how a transition builder should end completing a fully defined transition definition.
@@ -167,7 +170,7 @@ infix fun <S, T : Any> S.onTransition(event: KClass<out T>): TransitionBuilder<S
  * @param newState result of a successful transition
  */
 infix fun <S, T : Any> TransitionBuilder<S, T>.resultsIn(newState: S): TransitionDef<S, out T> =
-        TransitionDef(startState, event, newState)
+    TransitionDef(startState, event, newState)
 
 /**
  * Base definition for a partially defined transition.
@@ -178,6 +181,6 @@ interface TransitionBuilder<out S, out T : Any> {
 }
 
 private class ConcreteTransitionBuilder<out S, out T : Any>(
-        override val startState: S,
-        override val event: KClass<out T>
+    override val startState: S,
+    override val event: KClass<out T>
 ) : TransitionBuilder<S, T>

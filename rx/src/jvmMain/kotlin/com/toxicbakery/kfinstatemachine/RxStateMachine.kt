@@ -17,13 +17,13 @@ val <S, T : Any> StateMachine<S, T>.stateObservable: Observable<TransitionEvent<
 
 val <S, T : Any> StateMachine<S, T>.enterTransitionObservable: Observable<EnterTransition<S, T>>
     get() = stateObservable
-            .filter { event -> event is EnterTransition<S, T> }
-            .map { event -> event as EnterTransition<S, T> }
+        .filter { event -> event is EnterTransition<S, T> }
+        .map { event -> event as EnterTransition<S, T> }
 
 val <S, T : Any> StateMachine<S, T>.exitTransitionObservable: Observable<ExitTransition<S, T>>
     get() = stateObservable
-            .filter { event -> event is ExitTransition<S, T> }
-            .map { event -> event as ExitTransition<S, T> }
+        .filter { event -> event is ExitTransition<S, T> }
+        .map { event -> event as ExitTransition<S, T> }
 
 sealed class TransitionEvent<S, T : Any> {
 
@@ -35,10 +35,10 @@ sealed class TransitionEvent<S, T : Any> {
      * @param targetState the resulting state of this transition
      */
     data class EnterTransition<S, T : Any>(
-            val stateMachine: StateMachine<S, T>,
-            val currentState: S,
-            val transition: T,
-            val targetState: S
+        val stateMachine: StateMachine<S, T>,
+        val currentState: S,
+        val transition: T,
+        val targetState: S
     ) : TransitionEvent<S, T>()
 
     /**
@@ -49,10 +49,10 @@ sealed class TransitionEvent<S, T : Any> {
      * @param currentState the resulting state of this transition
      */
     data class ExitTransition<S, T : Any>(
-            val stateMachine: StateMachine<S, T>,
-            val previousState: S,
-            val transition: T,
-            val currentState: S
+        val stateMachine: StateMachine<S, T>,
+        val previousState: S,
+        val transition: T,
+        val currentState: S
     ) : TransitionEvent<S, T>()
 
 }
@@ -63,21 +63,21 @@ sealed class TransitionEvent<S, T : Any> {
  * @param emitter of the observable to report to
  */
 private class RxStateCallback<S, T : Any>(
-        private val emitter: ObservableEmitter<TransitionEvent<S, T>>
+    private val emitter: ObservableEmitter<TransitionEvent<S, T>>
 ) : TransitionCallback<S, T> {
 
     override fun enteringState(
-            stateMachine: StateMachine<S, T>,
-            currentState: S,
-            transition: T,
-            targetState: S
+        stateMachine: StateMachine<S, T>,
+        currentState: S,
+        transition: T,
+        targetState: S
     ) = emitter.onNext(EnterTransition(stateMachine, currentState, transition, targetState))
 
     override fun enteredState(
-            stateMachine: StateMachine<S, T>,
-            previousState: S,
-            transition: T,
-            currentState: S
+        stateMachine: StateMachine<S, T>,
+        previousState: S,
+        transition: T,
+        currentState: S
     ) = emitter.onNext(ExitTransition(stateMachine, previousState, transition, currentState))
 
 }

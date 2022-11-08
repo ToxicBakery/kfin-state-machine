@@ -21,17 +21,17 @@ sealed class TimerEvent {
 }
 
 class StopwatchMachine : StateMachine<TimerState, TimerEvent>(
-        Stopped,
-        transition(Stopped, Start::class, Running),
-        transition(Running, Tick::class, Running),
-        transition(Running, Stop::class, Stopped)
+    Stopped,
+    transition(Stopped, Start::class, Running),
+    transition(Running, Tick::class, Running),
+    transition(Running, Stop::class, Stopped)
 ) {
 
     private var tickerDisposable: Disposable = Disposables.disposed()
 
     override fun transition(transition: TimerEvent) {
         super.transition(transition)
-        when(transition) {
+        when (transition) {
             is Start -> startTicker()
             is Stop -> stopTicker()
             is Tick -> println(transition.tick)
@@ -40,7 +40,7 @@ class StopwatchMachine : StateMachine<TimerState, TimerEvent>(
 
     private fun startTicker() {
         tickerDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
-                .subscribe { tick: Long -> transition(Tick(tick)) }
+            .subscribe { tick: Long -> transition(Tick(tick)) }
     }
 
     private fun stopTicker() = tickerDisposable.dispose()
