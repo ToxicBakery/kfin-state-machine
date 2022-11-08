@@ -8,18 +8,19 @@ sealed class Direction(val shortId: String) {
 
     companion object {
         val DIRECTIONS: List<Direction> = listOf(
-                North,
-                South,
-                West,
-                East)
+            North,
+            South,
+            West,
+            East
+        )
 
         fun fromString(direction: String): Direction =
-                when (direction) {
-                    North.shortId -> North
-                    South.shortId -> South
-                    West.shortId -> West
-                    East.shortId -> East
-                    else -> throw Exception("Invalid direction $direction")
-                }
+            when (direction) {
+                North.shortId -> North
+                South.shortId -> South
+                West.shortId -> West
+                East.shortId -> East
+                else -> throw Exception("Invalid direction $direction")
+            }
     }
 }

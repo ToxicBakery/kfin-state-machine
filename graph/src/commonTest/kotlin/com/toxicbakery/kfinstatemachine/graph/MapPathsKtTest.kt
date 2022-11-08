@@ -8,41 +8,42 @@ class MapPathsKtTest {
     @Test
     fun mapAllPaths() {
         DirectedGraph(
-                mappedEdges = listOf(
-                        "node_1" to mapOf(
-                                "edge_1" to "node_2",
-                                "edge_2" to "node_3",
-                                "edge_6" to "node_1"
-                        ),
-                        "node_2" to mapOf(
-                                "edge_3" to "node_3",
-                                "edge_4" to "node_4"
-                        ),
-                        "node_4" to mapOf(
-                                "edge_5" to "node_2"
-                        ))
+            mappedEdges = listOf(
+                "node_1" to mapOf(
+                    "edge_1" to "node_2",
+                    "edge_2" to "node_3",
+                    "edge_6" to "node_1"
+                ),
+                "node_2" to mapOf(
+                    "edge_3" to "node_3",
+                    "edge_4" to "node_4"
+                ),
+                "node_4" to mapOf(
+                    "edge_5" to "node_2"
+                )
+            )
         ).mapAcyclicPaths("node_1")
-                .let { foundPaths: Set<List<String>> ->
-                    assertEquals(
-                            setOf(
-                                    listOf(
-                                            "node_1",
-                                            "node_2",
-                                            "node_3"
-                                    ),
-                                    listOf(
-                                            "node_1",
-                                            "node_2",
-                                            "node_4"
-                                    ),
-                                    listOf(
-                                            "node_1",
-                                            "node_3"
-                                    )
-                            ),
-                            foundPaths
-                    )
-                }
+            .let { foundPaths: Set<List<String>> ->
+                assertEquals(
+                    setOf(
+                        listOf(
+                            "node_1",
+                            "node_2",
+                            "node_3"
+                        ),
+                        listOf(
+                            "node_1",
+                            "node_2",
+                            "node_4"
+                        ),
+                        listOf(
+                            "node_1",
+                            "node_3"
+                        )
+                    ),
+                    foundPaths
+                )
+            }
     }
 
 }

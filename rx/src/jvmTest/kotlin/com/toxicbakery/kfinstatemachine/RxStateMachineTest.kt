@@ -23,20 +23,21 @@ class RxStateMachineTest {
     @Test
     fun observable() {
         val stateMachine = StateMachine(
-                Potential,
-                transition(Potential, Release::class, Kinetic),
-                transition(Kinetic, Store::class, Potential))
+            Potential,
+            transition(Potential, Release::class, Kinetic),
+            transition(Kinetic, Store::class, Potential)
+        )
 
         var lastEnterState: Energy = stateMachine.state
         var lastExitState: Energy = stateMachine.state
 
         val enterDisposable = stateMachine.enterTransitionObservable
-                .map { event -> event.currentState }
-                .subscribe { state -> lastEnterState = state }
+            .map { event -> event.currentState }
+            .subscribe { state -> lastEnterState = state }
 
         val exitDisposable = stateMachine.exitTransitionObservable
-                .map { event -> event.currentState }
-                .subscribe { state -> lastExitState = state }
+            .map { event -> event.currentState }
+            .subscribe { state -> lastExitState = state }
 
         // Transition to kinetic and verify the states
         stateMachine.transition(Release)
@@ -44,12 +45,14 @@ class RxStateMachineTest {
         assertEquals(Kinetic, lastExitState)
 
         assertEquals(
-                setOf(Store::class),
-                stateMachine.transitions)
+            setOf(Store::class),
+            stateMachine.transitions
+        )
 
         assertEquals(
-                setOf(Store::class),
-                stateMachine.transitionsTo(Potential))
+            setOf(Store::class),
+            stateMachine.transitionsTo(Potential)
+        )
 
         // Transition back to potential and verify the states
         stateMachine.transition(Store)
@@ -57,12 +60,14 @@ class RxStateMachineTest {
         assertEquals(Potential, lastExitState)
 
         assertEquals(
-                setOf(Release::class),
-                stateMachine.transitions)
+            setOf(Release::class),
+            stateMachine.transitions
+        )
 
         assertEquals(
-                setOf(Release::class),
-                stateMachine.transitionsTo(Kinetic))
+            setOf(Release::class),
+            stateMachine.transitionsTo(Kinetic)
+        )
 
         // Cleanup
         assertEquals(2, stateMachine.transitionCallbacks.size)

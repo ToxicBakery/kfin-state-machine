@@ -1,15 +1,7 @@
-enableFeaturePreview('GRADLE_METADATA')
-
 // Exported libraries
 include ':kfin'
 include ':graph'
 include ':rx'
-//include ':scxml'
-//include ':benchmark'
-
-// Tools
-include ':tools:hyperion'
-include ':tools:hyperion-no-op'
 
 // Samples
 include ':samples:stopwatch'

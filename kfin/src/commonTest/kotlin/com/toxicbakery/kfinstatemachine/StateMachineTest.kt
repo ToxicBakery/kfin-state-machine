@@ -15,9 +15,10 @@ class StateMachineTest {
     @Test
     fun performTransition() {
         val stateMachine = StateMachine(
-                Potential,
-                transition(Potential, Release::class, Kinetic),
-                transition(Kinetic, Store::class, Potential))
+            Potential,
+            transition(Potential, Release::class, Kinetic),
+            transition(Kinetic, Store::class, Potential)
+        )
 
         assertEquals(Potential, stateMachine.state)
 
@@ -31,11 +32,14 @@ class StateMachineTest {
     @Test
     fun performTransition_withList() {
         val stateMachine = StateMachine(
-                Potential,
-                listOf(
-                        transition(Potential, Release::class, Kinetic),
-                        transition(Kinetic, Store::class, Potential
-                        )))
+            Potential,
+            listOf(
+                transition(Potential, Release::class, Kinetic),
+                transition(
+                    Kinetic, Store::class, Potential
+                )
+            )
+        )
 
         assertEquals(Potential, stateMachine.state)
 
@@ -49,9 +53,10 @@ class StateMachineTest {
     @Test
     fun performTransition_withInfixFunctions() {
         val stateMachine = StateMachine(
-                Potential,
-                Potential onTransition Release::class resultsIn Kinetic,
-                Kinetic onTransition Store::class resultsIn Potential)
+            Potential,
+            Potential onTransition Release::class resultsIn Kinetic,
+            Kinetic onTransition Store::class resultsIn Potential
+        )
 
         assertEquals(Potential, stateMachine.state)
 
@@ -65,9 +70,10 @@ class StateMachineTest {
     @Test
     fun performTransition_invalidTransition() {
         val stateMachine = StateMachine(
-                Potential,
-                transition(Potential, Release::class, Kinetic),
-                transition(Kinetic, Store::class, Potential))
+            Potential,
+            transition(Potential, Release::class, Kinetic),
+            transition(Kinetic, Store::class, Potential)
+        )
 
         try {
             stateMachine.transition(Store)
@@ -80,10 +86,11 @@ class StateMachineTest {
     @Test
     fun performTransition_ambiguousTransition() {
         val stateMachine = StateMachine(
-                Potential,
-                transition(Potential, Release::class, Kinetic),
-                transition<Energy, Release>(Potential, Release::class, Potential),
-                transition(Kinetic, Store::class, Potential))
+            Potential,
+            transition(Potential, Release::class, Kinetic),
+            transition<Energy, Release>(Potential, Release::class, Potential),
+            transition(Kinetic, Store::class, Potential)
+        )
 
         try {
             stateMachine.transition(Release)
@@ -96,45 +103,53 @@ class StateMachineTest {
     @Test
     fun availableTransitions() {
         val stateMachine = StateMachine(
-                Potential,
-                transition(Potential, Release::class, Kinetic),
-                transition(Kinetic, Store::class, Potential))
+            Potential,
+            transition(Potential, Release::class, Kinetic),
+            transition(Kinetic, Store::class, Potential)
+        )
 
         assertEquals(
-                setOf(Release::class),
-                stateMachine.transitions)
+            setOf(Release::class),
+            stateMachine.transitions
+        )
 
         stateMachine.transition(Release)
 
         assertEquals(
-                setOf(Store::class),
-                stateMachine.transitions)
+            setOf(Store::class),
+            stateMachine.transitions
+        )
     }
 
     @Test
     fun transitionsForTargetState() {
         val stateMachine = StateMachine(
-                Potential,
-                transition(Potential, Release::class, Kinetic),
-                transition(Kinetic, Store::class, Potential))
+            Potential,
+            transition(Potential, Release::class, Kinetic),
+            transition(Kinetic, Store::class, Potential)
+        )
 
         assertEquals(
-                setOf(Release::class),
-                stateMachine.transitionsTo(Kinetic))
+            setOf(Release::class),
+            stateMachine.transitionsTo(Kinetic)
+        )
 
         assertEquals(
-                setOf(),
-                stateMachine.transitionsTo(Potential))
+            setOf(),
+            stateMachine.transitionsTo(Potential)
+        )
 
         stateMachine.transition(Release)
 
         assertEquals(
-                setOf(Store::class),
-                stateMachine.transitionsTo(Potential))
+            setOf(Store::class),
+            stateMachine.transitionsTo(Potential)
+        )
 
         assertEquals(
-                setOf(),
-                stateMachine.transitionsTo(Kinetic))
+            setOf(),
+            stateMachine.transitionsTo(Kinetic)
+        )
     }
 
     @Test
@@ -142,29 +157,30 @@ class StateMachineTest {
         var callbackCount = 0
         val callback = object : TransitionCallback<Energy, EnergyTransition> {
             override fun enteringState(
-                    stateMachine: StateMachine<Energy, EnergyTransition>,
-                    currentState: Energy,
-                    transition: EnergyTransition,
-                    targetState: Energy
+                stateMachine: StateMachine<Energy, EnergyTransition>,
+                currentState: Energy,
+                transition: EnergyTransition,
+                targetState: Energy
             ) {
                 ++callbackCount
             }
 
             override fun enteredState(
-                    stateMachine: StateMachine<Energy, EnergyTransition>,
-                    previousState: Energy,
-                    transition: EnergyTransition,
-                    currentState: Energy
+                stateMachine: StateMachine<Energy, EnergyTransition>,
+                previousState: Energy,
+                transition: EnergyTransition,
+                currentState: Energy
             ) {
                 ++callbackCount
             }
         }
 
         val stateMachine = StateMachine(
-                Potential,
-                transition(Potential, Release::class, Kinetic),
-                transition(Kinetic, Store::class, Potential))
-                .apply { registerCallback(callback) }
+            Potential,
+            transition(Potential, Release::class, Kinetic),
+            transition(Kinetic, Store::class, Potential)
+        )
+            .apply { registerCallback(callback) }
 
         stateMachine.transition(Release)
         assertEquals(2, callbackCount)

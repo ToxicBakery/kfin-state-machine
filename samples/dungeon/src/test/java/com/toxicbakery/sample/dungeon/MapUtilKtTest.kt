@@ -7,18 +7,18 @@ class MapUtilKtTest {
     @Test
     fun mapToDirectedGraph() {
         mapToDirectedGraph(
-                Array(2, { _ ->
-                    Array(2, { _ -> true })
-                })
+            Array(2, { _ ->
+                Array(2, { _ -> true })
+            })
         )
     }
 
     @Test(expected = Exception::class)
     fun mapToDirectedGraphNotSquare() {
         mapToDirectedGraph(
-                Array(2, { _ ->
-                    Array(1, { _ -> true })
-                })
+            Array(2, { _ ->
+                Array(1, { _ -> true })
+            })
         )
     }
 

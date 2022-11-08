@@ -1,8 +1,10 @@
 # Graph
-Directed graph implementation which may be useful for creating large machines more quickly. 
+
+Directed graph implementation which may be useful for creating large machines more quickly.
 The [Dungeon](samples/dungeon) sample demonstrates a use case of this module.
 
 ## Sample Usage
+
 ```kotlin
 sealed class Energy {
     object Kinetic : Energy()
@@ -22,7 +24,9 @@ DirectedGraph(
 ```
 
 ## Install
+
 Includes directed graphs
+
 ```groovy
 compile "com.ToxicBakery.kfinstatemachine:graph:2.+"
 ```
