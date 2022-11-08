@@ -11,9 +11,7 @@ kotlin {
         withJava()
     }
     js {
-        browser {
-            binaries.executable()
-        }
+        nodejs()
     }
     sourceSets {
         val commonMain by getting {
