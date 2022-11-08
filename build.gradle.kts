@@ -20,7 +20,7 @@ subprojects {
     val tag = if (isTag) "" else "-SNAPSHOT"
 
     group = "com.ToxicBakery.kfinstatemachine"
-    version = "4.3.$buildNumber$tag"
+    version = "5.0.$buildNumber$tag"
 
     tasks.withType(Test::class.java) {
         testLogging {
